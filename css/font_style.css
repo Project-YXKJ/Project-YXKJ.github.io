@@ -1,0 +1,374 @@
+@font-face {
+  font-family: 'vetron';
+  src: url('fonts/vetron.woff?kiuv96') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'vetron' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-specification:before {
+  content: "\e900";
+}
+.icon-undertable:before {
+  content: "\e901";
+}
+.icon-motorcover1:before {
+  content: "\e902";
+}
+.icon-motorcover2:before {
+  content: "\e903";
+}
+.icon-warning:before {
+  content: "\e904";
+}
+.icon-warning_electric:before {
+  content: "\e905";
+}
+.icon-warning_injury1:before {
+  content: "\e906";
+}
+.icon-warning_injury2:before {
+  content: "\e907";
+}
+.icon-power_switch:before {
+  content: "\e908";
+}
+.icon-plug:before {
+  content: "\e909";
+}
+.icon-connector:before {
+  content: "\e90a";
+}
+.icon-dsub:before {
+  content: "\e90b";
+}
+.icon-table:before {
+  content: "\e90c";
+}
+.icon-message:before {
+  content: "\e90d";
+}
+.icon-light:before {
+  content: "\e90e";
+}
+.icon-brightness:before {
+  content: "\e90f";
+}
+.icon-soundoff:before {
+  content: "\e910";
+}
+.icon-soundon:before {
+  content: "\e911";
+}
+.icon-touchscreen:before {
+  content: "\e912";
+}
+.icon-panel:before {
+  content: "\e913";
+}
+.icon-language:before {
+  content: "\e914";
+}
+.icon-config:before {
+  content: "\e915";
+}
+.icon-password:before {
+  content: "\e916";
+}
+.icon-about:before {
+  content: "\e917";
+}
+.icon-troubleshooting:before {
+  content: "\e918";
+}
+.icon-arrow-left:before {
+  content: "\e919";
+}
+.icon-arrow-right:before {
+  content: "\e91a";
+}
+.icon-reset:before {
+  content: "\e91b";
+}
+.icon-return:before {
+  content: "\e91c";
+}
+.icon-swoff:before {
+  content: "\e91d";
+}
+.icon-swon:before {
+  content: "\e91e";
+}
+.icon-unlock:before {
+  content: "\e91f";
+}
+.icon-lock:before {
+  content: "\e920";
+}
+.icon-bobbin:before {
+  content: "\e921";
+}
+.icon-shirt:before {
+  content: "\e922";
+}
+.icon-carseat:before {
+  content: "\e923";
+}
+.icon-sofa:before {
+  content: "\e924";
+}
+.icon-thread:before {
+  content: "\e925";
+}
+.icon-usb:before {
+  content: "\e926";
+}
+.icon-authorize:before {
+  content: "\e927";
+}
+.icon-usb-stick:before {
+  content: "\e928";
+}
+.icon-clock:before {
+  content: "\e929";
+}
+.icon-calendar:before {
+  content: "\e92a";
+}
+.icon-list:before {
+  content: "\e92b";
+}
+.icon-chip:before {
+  content: "\e92c";
+}
+.icon-statistics:before {
+  content: "\e92d";
+}
+.icon-meter:before {
+  content: "\e92e";
+}
+.icon-monitor:before {
+  content: "\e92f";
+}
+.icon-pattern:before {
+  content: "\e930";
+}
+.icon-autosew:before {
+  content: "\e931";
+}
+.icon-length_mm:before {
+  content: "\e932";
+}
+.icon-tiny-tack:before {
+  content: "\e933";
+}
+.icon-speed:before {
+  content: "\e934";
+}
+.icon-ramp:before {
+  content: "\e935";
+}
+.icon-zeromark:before {
+  content: "\e936";
+}
+.icon-machine:before {
+  content: "\e937";
+}
+.icon-machine-config:before {
+  content: "\e938";
+}
+.icon-machineid:before {
+  content: "\e939";
+}
+.icon-endurance:before {
+  content: "\e93a";
+}
+.icon-turn-back:before {
+  content: "\e93b";
+}
+.icon-neddledown:before {
+  content: "\e93c";
+}
+.icon-needle-up:before {
+  content: "\e93d";
+}
+.icon-liftneedlebar:before {
+  content: "\e93e";
+}
+.icon-motor:before {
+  content: "\e93f";
+}
+.icon-main-motor:before {
+  content: "\e940";
+}
+.icon-stepper-motor:before {
+  content: "\e941";
+}
+.icon-torque:before {
+  content: "\e942";
+}
+.icon-motionplan:before {
+  content: "\e943";
+}
+.icon-lockshaft:before {
+  content: "\e944";
+}
+.icon-field-weak:before {
+  content: "\e945";
+}
+.icon-drive:before {
+  content: "\e946";
+}
+.icon-capacitor:before {
+  content: "\e947";
+}
+.icon-input:before {
+  content: "\e948";
+}
+.icon-tiltswitch:before {
+  content: "\e949";
+}
+.icon-handwheel:before {
+  content: "\e94a";
+}
+.icon-strokeknob:before {
+  content: "\e94b";
+}
+.icon-kneeswitch:before {
+  content: "\e94c";
+}
+.icon-shortkey:before {
+  content: "\e94d";
+}
+.icon-pedal:before {
+  content: "\e94e";
+}
+.icon-standpedal:before {
+  content: "\e94f";
+}
+.icon-upthread-monitor:before {
+  content: "\e950";
+}
+.icon-acutator:before {
+  content: "\e951";
+}
+.icon-trimmer:before {
+  content: "\e952";
+}
+.icon-short-trim:before {
+  content: "\e953";
+}
+.icon-reverse:before {
+  content: "\e954";
+}
+.icon-foot:before {
+  content: "\e955";
+}
+.icon-foot-sew:before {
+  content: "\e956";
+}
+.icon-foot-trimmer:before {
+  content: "\e957";
+}
+.icon-tension:before {
+  content: "\e958";
+}
+.icon-tension-add:before {
+  content: "\e959";
+}
+.icon-wiper:before {
+  content: "\e95a";
+}
+.icon-clamp:before {
+  content: "\e95b";
+}
+.icon-stroke:before {
+  content: "\e95c";
+}
+.icon-stroke-add:before {
+  content: "\e95d";
+}
+.icon-stitchlength:before {
+  content: "\e95e";
+}
+.icon-stitchlength-add:before {
+  content: "\e95f";
+}
+.icon-seamguide:before {
+  content: "\e960";
+}
+.icon-needle-cooling:before {
+  content: "\e961";
+}
+.icon-correction:before {
+  content: "\e962";
+}
+.icon-bartack-cancel:before {
+  content: "\e963";
+}
+.icon-SDF:before {
+  content: "\e964";
+}
+.icon-SDB:before {
+  content: "\e965";
+}
+.icon-SDFB:before {
+  content: "\e966";
+}
+.icon-start-bartack:before {
+  content: "\e967";
+}
+.icon-sewmode:before {
+  content: "\e968";
+}
+.icon-prog-sew:before {
+  content: "\e969";
+}
+.icon-end-bartack:before {
+  content: "\e96a";
+}
+.icon-single-tack-s:before {
+  content: "\e96b";
+}
+.icon-dual-tack-s:before {
+  content: "\e96c";
+}
+.icon-single-tack-e:before {
+  content: "\e96d";
+}
+.icon-dual-tack-e:before {
+  content: "\e96e";
+}
+.icon-bobbin-change:before {
+  content: "\e96f";
+}
+.icon-bar-seam:before {
+  content: "\e970";
+}
+.icon-combine-key:before {
+  content: "\e971";
+}
+.icon-keyboard_backspace:before {
+  content: "\e972";
+}
+.icon-backspace-outline:before {
+  content: "\e973";
+}
+.icon-keyboard_return:before {
+  content: "\e974";
+}

@@ -1,0 +1,1176 @@
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta id="viewport" name="viewport"
+		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<style type="text/css">
+		@import url("css/style.css");
+		@import url("css/font_style.css");
+	</style>
+	<title>银星电控参数表</title>
+</head>
+
+<div id="loadpara" style="display:flex;align-items:center;">
+	<text style="font-size:200%" id="version"></text>
+	<image style="margin-left:50px;height:100px;" src="images/wechat_scan.jpg"></image>
+	<select id="language" style="margin-left:50px;"></select>
+	<select id="viewmode" style="margin-left:50px;"></select>
+	<input type="file" id="files" accept=".json" style="margin-left:50px;" />
+</div>
+
+<!--<input type="file" id="para"  accept="application/para_json"/>-->
+
+<div style="margin-top:10px;margin-bottom:10px;">
+	<select id="machinetype">
+	</select>
+</div>
+<div style="margin-top:10px;margin-bottom:10px;">
+	<select id="errormsg">
+	</select>
+</div>
+<div style="margin-top:10px;margin-bottom:10px;">
+	<select id="panelstring">
+	</select>
+</div>
+<div style="margin-top:10px;margin-bottom:10px;">
+	<select id="category">
+	</select>
+	<button id="exportcsv">导出csv文件</button>
+	<button id="stringccode">字符串结构体输出</button>
+	<button id="paraccode">参数表结构体输出</button>
+	<button id="machineidlist">机型数组输出</button>
+	<button id="errorcodelist">错误代码数组输出</button>
+</div>
+
+<div class="shareBox">
+	<div style="margin-top:10px;margin-bottom:10px;">
+		<button id="exportjson">导出json文件</button>
+		<button id="insertparameter">插入新参数</button>
+		<button id="deleteparameter">删除参数</button>
+		<button id="savechanges">保存修改</button>
+		<button id="sortparameters">排序</button>
+	</div>
+	<!-- 分享状态 -->
+	<div class="shareState clearfix">
+		<div class="shareSateList" id="shareSateList">
+
+		</div>
+	</div>
+</div>
+
+
+<tabel id="para_table">
+</tabel>
+
+<script>
+	var para_json;
+	var parameterarray;
+	var selectLanguage;
+	var selectmode;
+	var editState = 0;
+	var dragParameterIndex = 0;
+	var dropParameterIndex = 0;
+	var selectItemIndex = -1;
+	var inputElement = document.getElementById("files");
+	inputElement.addEventListener("change", handleFiles, false);
+	var selobj = document.getElementById('language');
+	selobj.add(new Option("中文"));
+	selobj.add(new Option("English"));
+	selobj.addEventListener("change", ChangeLanugage, false);
+	var language = localStorage.getItem("lan");
+	if (language == "zh") {
+		//alert("zh");
+		selectLanguage = false;
+		selobj.options[0].selected = true;
+	}
+	else {
+		//alert("en");
+		selectLanguage = true;
+		selobj.options[1].selected = true;
+	}
+	var selobj = document.getElementById('viewmode');
+	selobj.add(new Option("浏览"));
+	selobj.add(new Option("编辑"));
+	selobj.addEventListener("change", ChangeMode, false);
+	var viewmode = localStorage.getItem("mode");
+
+	if (viewmode == "lookup") {
+		selectmode = true;
+		selobj.options[0].selected = true;
+	}
+	else {
+		selectmode = false;
+		selobj.options[1].selected = true;
+	}
+	function ChangeLanugage() {
+		var select = document.getElementById('language');
+		var selectIdx = 0;
+		if (select.options[0].selected == true) {
+			selectLanguage = false;
+			if (selectmode)
+				user_loadparbycate();
+			else loadparbycate();
+			if (!!localStorage) {
+				localStorage.setItem("lan", "zh");
+			}
+		}
+		else {
+			selectLanguage = true;
+			if (selectmode)
+				user_loadparbycate();
+			else loadparbycate();
+
+			if (!!localStorage) {
+				localStorage.setItem("lan", "en");
+			}
+		}
+	}
+
+	function hideSomeElement() {
+		var inputElement = document.getElementById("exportjson");
+		inputElement.style = 'display:none';
+		var inputElement = document.getElementById("insertparameter");
+		inputElement.style = 'display:none';
+		var inputElement = document.getElementById("deleteparameter");
+		inputElement.style = 'display:none';
+		var inputElement = document.getElementById("savechanges");
+		inputElement.style = 'display:none';
+		var inputElement = document.getElementById("sortparameters");
+		inputElement.style = 'display:none';
+		var inputElement = document.getElementById("exportcsv");
+		inputElement.style = 'display:none';
+		var inputElement = document.getElementById("stringccode");
+		inputElement.style = 'display:none';
+		var inputElement = document.getElementById("paraccode");
+		inputElement.style = 'display:none';
+		var inputElement = document.getElementById("machineidlist");
+		inputElement.style = 'display:none';
+		var inputElement = document.getElementById("errorcodelist");
+		inputElement.style = 'display:none';
+	}
+
+	function showSomeElement() {
+		var inputElement = document.getElementById("exportjson");
+		inputElement.style = 'display:inline';
+		var inputElement = document.getElementById("insertparameter");
+		inputElement.style = 'display:inline';
+		var inputElement = document.getElementById("deleteparameter");
+		inputElement.style = 'display:inline';
+		var inputElement = document.getElementById("savechanges");
+		inputElement.style = 'display:inline';
+		var inputElement = document.getElementById("sortparameters");
+		inputElement.style = 'display:inline';
+		var inputElement = document.getElementById("exportcsv");
+		inputElement.style = 'display:inline';
+		var inputElement = document.getElementById("stringccode");
+		inputElement.style = 'display:inline';
+		var inputElement = document.getElementById("paraccode");
+		inputElement.style = 'display:inline';
+		var inputElement = document.getElementById("machineidlist");
+		inputElement.style = 'display:inline';
+		var inputElement = document.getElementById("errorcodelist");
+		inputElement.style = 'display:inline';
+	}
+
+	function ChangeMode() {
+		var select = document.getElementById('viewmode');
+		var selectIdx = 0;
+		if (select.options[0].selected == true) {
+			selectmode = true;
+			user_loadparbycate();
+			hideSomeElement();
+			if (!!localStorage) {
+				localStorage.setItem("mode", "lookup");
+			}
+		}
+		else {
+			selectmode = false;
+			loadparbycate();
+			showSomeElement();
+
+			if (!!localStorage) {
+				localStorage.setItem("mode", "edit");
+			}
+		}
+	}
+
+
+	function setJsonLocalStorage(json_json) {
+		if (!!localStorage) {
+			localStorage.setItem("json", JSON.stringify(json_json));
+		}
+	}
+	function getJsonLocalStorage() {
+		if (!!localStorage) {
+			var json_str = localStorage.getItem("json");
+		}
+		return json_str;
+	}
+
+	function saveJSON(data, filename) {
+		if (!data) {
+			alert('保存的数据为空');
+			return;
+		}
+		if (!filename)
+			filename = 'json.json'
+		if (typeof data === 'object') {
+			data = JSON.stringify(data, undefined, 4)
+		}
+		var blob = new Blob([data], { type: 'text/json' }),
+			e = document.createEvent('MouseEvents'),
+			a = document.createElement('a')
+		a.download = filename
+		a.href = window.URL.createObjectURL(blob)
+		a.dataset.downloadurl = ['text/json', a.download, a.href].join(':')
+		e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+		a.dispatchEvent(e)
+	}
+
+	function handleFiles() {
+		var selectedFile = document.getElementById("files").files[0];//获取读取的File对象
+		//获取读取的File对象
+		var name = selectedFile.name;//读取选中文件的文件名
+		var size = selectedFile.size;//读取选中文件的大小
+		//   var div1;
+		machinetype.length = 0;
+		console.log("文件名:" + name + "大小：" + size);
+		var reader1 = new FileReader();//这里是核心！！！读取操作就是由它完成的。
+		//reader1.readAsArrayBuffer(selectedFile);//读取文件的内容
+		reader1.readAsText(selectedFile);
+		reader1.onload = function () {
+			//parameterarray = new Uint16Array(this.result);
+			//console.log(parameter);
+			para_json = JSON.parse(this.result);
+			var selobj = document.getElementById('version');
+			selobj.innerHTML = "参数版本:" + para_json.Info.version + "  " + para_json.Info.desc_zh;
+			var selobj = document.getElementById('category');
+			for (var key in para_json.category) {
+				selobj.add(new Option(para_json.category[key].enumname + "  " + para_json.category[key].desc_zh));
+			}
+			var selobj = document.getElementById('errormsg');
+			for (var i = 0; i < para_json.errormessage.length; i++) {
+				selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_zh));
+			}
+			var selobj = document.getElementById('machinetype');
+			for (var i = 0; i < para_json.machinetype.length; i++) {
+				selobj.add(new Option(para_json.machinetype[i].id + "  " + para_json.machinetype[i].type));
+			}
+			var selobj = document.getElementById('panelstring');
+			for (var i = 0; i < para_json.panelstrings.length; i++) {
+				selobj.add(new Option(para_json.panelstrings[i].enumname + "  " + para_json.panelstrings[i].desc_zh));
+			}
+			if (selectmode)
+				user_loadparbycate();
+			else loadparbycate();
+			//var str = JSON.stringify(para_json);
+			//将失信人信息存入cookie,这个存cookie的方法提前封装好
+			setJsonLocalStorage(para_json);
+		}
+	}
+
+
+	function editJson(idx) {
+		var selectCateIdx;
+		OpenWindow = window.open("参数信息", "newwin", "height=830, width=600,toolbar=no,scrollbars=yes,menubar=no");
+		//OpenWindow.document.write("<p style = 'color:red;'>" + para_json.parameters[idx].name + "</>");
+		OpenWindow.document.write("<p>传统名称  </>");
+		OpenWindow.document.write("<input type='text' id = 'name1' style = 'margin-left:10px;color:red;' value = '" + para_json.parameters[idx].name.toString() + "'></input>");
+		OpenWindow.document.write("<p>枚举名  </>");
+		OpenWindow.document.write("<input type='text' id = 'enumname1' style = 'margin-left:10px;color:red;' value = '" + para_json.parameters[idx].enumname.toString() + "'></input>");
+		OpenWindow.document.write("<p>参数类别  </>");
+		OpenWindow.document.write("<select id= 'category1'></select>");
+		OpenWindow.document.write("<p>参数权限  </>");
+		OpenWindow.document.write("<select id= 'auth1'></select>");
+		OpenWindow.document.write("<p>参数类型  </>");
+		OpenWindow.document.write("<select id= 'type1'></select>");
+		OpenWindow.document.write("<p>参数标题  </br>");
+		OpenWindow.document.write("<textarea id= 'title_zh1' style = 'width:550px;height:50px'>" + para_json.parameters[idx].title_zh + "</textarea>");
+		OpenWindow.document.write("<p>参数详中文细描述  </br>");
+		OpenWindow.document.write("<textarea id= 'desc_zh1' style = 'width:550px;height:50px'>" + para_json.parameters[idx].desc_zh + "</textarea>");
+		OpenWindow.document.write("<p>参数最大值  </br>");
+		OpenWindow.document.write("<input type='text' id= 'max_value1' value = '" + para_json.parameters[idx].max.toString() + "'></input>");
+		OpenWindow.document.write("<p>参数最小值  </br>");
+		OpenWindow.document.write("<input id= 'min_value1' value = '" + para_json.parameters[idx].min.toString() + "'></input>");
+		OpenWindow.document.write("<p>参数缺省值  </br>");
+		OpenWindow.document.write("<input id= 'default_value1' value = '" + para_json.parameters[idx].initial.toString() + "'></input>");
+		OpenWindow.document.write("<p>参数单位  </br>");
+		OpenWindow.document.write("<input id= 'unit1' value = '" + para_json.parameters[idx].unit.toString() + "'></input>");
+		OpenWindow.document.write("<p>En title  </br>");
+		OpenWindow.document.write("<textarea id= 'title_en1' style = 'width:550px;height:50px'>" + para_json.parameters[idx].title_en + "</textarea>");
+		OpenWindow.document.write("<p>En desc  </br>");
+		OpenWindow.document.write("<textarea id= 'desc_en1' style = 'width:550px;height:50px'>" + para_json.parameters[idx].desc_en + "</textarea>");
+		OpenWindow.document.write("<p></>");
+		OpenWindow.document.write("<button id= 'confirm1' style = 'margin-left:50px;'>修改</button>");
+		OpenWindow.document.write("<nobr>");
+		//OpenWindow.document.write("<input type='file' id= 'upload' accept = '.json' style = 'margin-left:50px;'></input>");
+
+		//OpenWindow.document.write("<nobr>");
+		OpenWindow.document.write("<button id= 'cancel1'style = 'margin-left:50px;'>关闭</button>");
+
+		// var inputElement = OpenWindow.document.getElementById('upload');
+		// inputElement.addEventListener("change", uploadFile, false);
+
+		// function uploadFile() {
+		// 	alert('123');
+		// }
+
+		var select = OpenWindow.document.getElementById('category1');
+		for (var key in para_json.category) {
+			select.add(new Option(para_json.category[key].enumname + "  " + para_json.category[key].desc_zh));
+			if (para_json.category[key].enumname == para_json.parameters[idx].cate) {
+				selectCateIdx = parseInt(key);
+			}
+		}
+		select.options[selectCateIdx].selected = true;
+
+		var select = OpenWindow.document.getElementById('auth1');
+		var selectIdx = 0;
+		for (var key in para_json.authority) {
+			select.add(new Option(key + "  " + para_json.authority[key]));
+			if (key == para_json.parameters[idx].auth) {
+				selectCateIdx = selectIdx;
+			}
+			selectIdx++;
+		}
+		select.options[selectCateIdx].selected = true;
+
+		var selectIdx = 0;
+		var select = OpenWindow.document.getElementById('type1');
+		for (var key in para_json.paratype) {
+			select.add(new Option(key + "  " + para_json.paratype[key]));
+			if (key == para_json.parameters[idx].type) {
+				selectCateIdx = selectIdx;
+			}
+			selectIdx++;
+		}
+		select.options[selectCateIdx].selected = true;
+
+		var button_confirm = OpenWindow.document.getElementById('confirm1');
+		button_confirm.onclick = function () {
+			var input = OpenWindow.document.getElementById('name1');
+			para_json.parameters[idx].name = input.value;
+
+			var input = OpenWindow.document.getElementById('enumname1');
+			para_json.parameters[idx].enumname = input.value;
+
+			var select = OpenWindow.document.getElementById('category1');
+			para_json.parameters[idx].cate = select.value.substring(0, select.value.indexOf(' '));
+			var select = OpenWindow.document.getElementById('auth1');
+			para_json.parameters[idx].auth = select.value.substring(0, select.value.indexOf(' '));
+			var select = OpenWindow.document.getElementById('type1');
+			para_json.parameters[idx].type = select.value.substring(0, select.value.indexOf(' '));
+			var input = OpenWindow.document.getElementById('max_value1');
+			para_json.parameters[idx].max = input.value;
+			var input = OpenWindow.document.getElementById('min_value1');
+			para_json.parameters[idx].min = input.value;
+			var input = OpenWindow.document.getElementById('default_value1');
+			para_json.parameters[idx].initial = input.value;
+			var input = OpenWindow.document.getElementById('unit1');
+			para_json.parameters[idx].unit = input.value;
+			var input = OpenWindow.document.getElementById('title_en1');
+			para_json.parameters[idx].title_en = input.value;
+			var input = OpenWindow.document.getElementById('title_zh1');
+			para_json.parameters[idx].title_zh = input.value;
+			var input = OpenWindow.document.getElementById('desc_en1');
+			para_json.parameters[idx].desc_en = input.value;
+			var input = OpenWindow.document.getElementById('desc_zh1');
+			para_json.parameters[idx].desc_zh = input.value;
+			OpenWindow.close();
+			editState = 0;
+			loadparbycate();
+		}
+
+
+
+		var button_cancel = OpenWindow.document.getElementById('cancel1');
+		button_cancel.onclick = function () {
+			OpenWindow.close();
+			editState = 0;
+		}
+	}
+	if (selectmode) hideSomeElement();
+	else showSomeElement();
+	var para_json_str = getJsonLocalStorage();
+	para_json = JSON.parse(para_json_str);
+
+	if (para_json != null) {
+		var selobj = document.getElementById('version');
+		selobj.innerHTML = "参数版本:" + para_json.Info.version + "  " + para_json.Info.desc_zh;
+		var selobj = document.getElementById('category');
+		for (var key in para_json.category) {
+			selobj.add(new Option(para_json.category[key].enumname + "  " + para_json.category[key].desc_zh));
+		}
+		var selobj = document.getElementById('errormsg');
+		for (var i = 0; i < para_json.errormessage.length; i++) {
+			selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_zh));
+		}
+		var selobj = document.getElementById('machinetype');
+		for (var i = 0; i < para_json.machinetype.length; i++) {
+			selobj.add(new Option(para_json.machinetype[i].id + "  " + para_json.machinetype[i].type));
+		}
+		var selobj = document.getElementById('panelstring');
+		for (var i = 0; i < para_json.panelstrings.length; i++) {
+			selobj.add(new Option(para_json.panelstrings[i].enumname + "  " + para_json.panelstrings[i].desc_zh));
+		}
+		if (selectmode)
+			user_loadparbycate();
+		else loadparbycate();
+	}
+
+	var selectElement = document.getElementById("category");
+	selectElement.addEventListener("change", selectmode ? user_loadparbycate : loadparbycate, false);
+
+	var selectElement = document.getElementById("machinetype");
+	selectElement.addEventListener("change", selectmode ? user_loadparbycate : loadparbycate, false);
+
+	function padd(num, n) {
+		y = '00000000000000000000000000000' + num; //爱几个0就几个，自己够用就行
+		return y.substr(y.length - n);
+	}
+
+	function loadparbycate() {
+		var selectedCate = document.getElementById("category").value;//获取读取的File对象
+		var tab = document.getElementById('para_table');
+		tab.innerHTML = "";
+
+		var tab = document.getElementById('shareSateList');
+		tab.innerHTML = "";
+		var cateparindex = 0;
+		var cateparindexbase = "";
+		var cate_index_counter = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, , 0, 0, 0, 0, 0, , 0, 0, 0, 0];
+		var cateparindex_str = "";
+
+		var machineid = document.getElementById("machinetype").selectedIndex;
+
+		for (var i = 0; i < para_json.parameters.length; i++) {
+			var cate = para_json.parameters[i].cate;
+			var cate1 = selectedCate.split(' ')[0];
+			if (cate1 == cate || selectedCate.indexOf('All') != -1) {
+				var oShareStateList = document.getElementById('shareSateList');
+
+				//为 shareSateList 新增子节点，即新添加一个名片
+				var oAddItem = document.createElement('div' + i.toString());
+				oAddItem.className = "item";
+				if (selectItemIndex == i) {
+					oAddItem.style = 'background-color:lightgreen';
+				}
+				// if (data[i].state == 0) {
+
+				oAddItem.draggable = true;
+				oAddItem.ondragstart = function drag(ev) {
+					ev.dataTransfer.setData("Text", ev.target.nodeName);
+					//console.log("Drag " + ev.target.nodeName)
+					var ssss = ev.target.nodeName;
+					var ssss = ssss.replace(/[^0-9]/ig, "");
+					dragParameterIndex = parseInt(ssss);
+					//console.log("Drag from " + dragParameterIndex);
+				}
+				oAddItem.ondragover = function allowdrop(ev) {
+					ev.preventDefault();
+
+				}
+				oAddItem.ondrop = function drop(ev) {
+					var ssss = ev.target.nodeName;
+					var ssss = ssss.replace(/[^0-9]/ig, "");
+					dropParameterIndex = parseInt(ssss);
+					//console.log("Drop at " + dropParameterIndex);
+					var para_temp = para_json.parameters[dragParameterIndex];
+					// para_json.parameters[dragParameterIndex] = para_json.parameters[dropParameterIndex];
+					// para_json.parameters[dropParameterIndex] = para_temp;
+					para_json.parameters.splice(dragParameterIndex, 1);
+					para_json.parameters.splice(dropParameterIndex, 0, para_temp);
+					loadparbycate();
+				}
+				oAddItem.onclick = function (ev) {
+					var ssss = ev.target.nodeName;
+					var ssss = ssss.replace(/[^0-9]/ig, "");
+					if (parseInt(ssss) != selectItemIndex) {
+						selectItemIndex = parseInt(ssss);
+					}
+					else {
+						selectItemIndex = -1;
+					}
+					//console.log(selectItemIndex)
+					loadparbycate();
+				}
+				oAddItem.ondblclick = function (ev) {
+					if (editState == 0) {
+						var ssss = ev.target.nodeName;
+						var ssss = ssss.replace(/[^0-9]/ig, "");
+						editJson(parseInt(ssss));
+						//editState = 1;
+					}
+				}
+				oShareStateList.appendChild(oAddItem);
+
+				//添加新增添的名片里的内容
+				var oAddItemInfo = document.createElement('divinfo' + i.toString());
+				oAddItemInfo.className = 'itemInfo';
+				oAddItem.appendChild(oAddItemInfo);
+
+				//添分享状态角标
+				var oMark = document.createElement('cate' + i.toString());
+				oMark.style = "margin-top:10px;margin-left:10px;font-size:35px;color:blue";
+				if (para_json.parameters[i].cate == "Cate_Backtack") {
+					oMark.className = 'icon-start-bartack';
+					cateparindexbase = "00";
+					cate_index_counter[0]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[0].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Clamp") {
+					oMark.className = 'icon-clamp';
+					cateparindexbase = "01";
+					cate_index_counter[1]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[1].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Trimmer") {
+					oMark.className = 'icon-trimmer';
+					cateparindexbase = "02";
+					cate_index_counter[2]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[2].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Footlift") {
+					oMark.className = 'icon-foot';
+					cateparindexbase = "03";
+					cate_index_counter[3]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[3].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_SecondStitchLength") {
+					oMark.className = 'icon-stitchlength-add';
+					cateparindexbase = "04";
+					cate_index_counter[4]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[4].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_SoftStart") {
+					oMark.className = 'icon-ramp';
+					cateparindexbase = "05";
+					cate_index_counter[5]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[5].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Monitor") {
+					oMark.className = 'icon-bobbin-change';
+					cateparindexbase = "06";
+					cate_index_counter[6]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[6].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Seam") {
+					oMark.className = 'icon-sewmode';
+					cateparindexbase = "07";
+					cate_index_counter[7]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[7].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Motor") {
+					oMark.className = 'icon-motor';
+					cateparindexbase = "08";
+					cate_index_counter[8]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[8].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Tension") {
+					oMark.className = 'icon-tension';
+					cateparindexbase = "09";
+					cate_index_counter[9]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[9].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_StrokeHeight") {
+					oMark.className = 'icon-stroke';
+					cateparindexbase = "10";
+					cate_index_counter[10]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[10].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_SecuritySwitch") {
+					oMark.className = 'icon-tiltswitch';
+					cateparindexbase = "11";
+					cate_index_counter[11]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[11].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_NeedleCooling") {
+					oMark.className = 'icon-needle-cooling';
+					cateparindexbase = "13";
+					cate_index_counter[12]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[12].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_SeamCenterGuide") {
+					oMark.className = 'icon-seamguide';
+					cateparindexbase = "14";
+					cate_index_counter[13]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[13].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_HandWheel") {
+					oMark.className = 'icon-handwheel';
+					cateparindexbase = "17";
+					cate_index_counter[14]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[14].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Wiper") {
+					oMark.className = 'icon-wiper';
+					cateparindexbase = "20";
+					cate_index_counter[15]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[15].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Statistics") {
+					oMark.className = 'icon-stastistics';
+					cateparindexbase = "24";
+					cate_index_counter[16]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[16].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_ControlBoxAndOther") {
+					oMark.className = 'icon-undertable';
+					cateparindexbase = "51";
+					cate_index_counter[17]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[17].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_HMI") {
+					oMark.className = 'icon-panel';
+					cateparindexbase = "52";
+					cate_index_counter[18]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[18].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_InputConfig") {
+					oMark.className = 'icon-combine-key';
+					cateparindexbase = "53";
+					cate_index_counter[19]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[19].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_OutputConfig") {
+					oMark.className = 'icon-acutator';
+					cateparindexbase = "54";
+					cate_index_counter[20]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[20].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Test") {
+					oMark.className = 'icon-endurance';
+					cateparindexbase = "60";
+					cate_index_counter[21]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[21].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Assemble") {
+					oMark.className = 'icon-machine-config';
+					cateparindexbase = "61";
+					cate_index_counter[22]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[22].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Reverse") {
+					oMark.className = 'icon-reverse';
+					cateparindexbase = "62";
+					cate_index_counter[23]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[23].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_TurnBack") {
+					oMark.className = 'icon-motor';
+					cateparindexbase = "12";
+					cate_index_counter[24]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[24].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_DoubleNeedleCorner") {
+					oMark.className = 'icon-prog-sew';
+					cateparindexbase = "33";
+					cate_index_counter[25]++;
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[25].toString()).slice(-2);
+				}
+				else if (para_json.parameters[i].cate == "Cate_Reserved") {
+					oMark.className = 'icon-troubleshooting';
+					cate_index_counter[26]++;
+					cateparindexbase = "63";
+					cateparindex_str = cateparindexbase + (Array(2).join(0) + cate_index_counter[26].toString()).slice(-2);
+				}
+				if (para_json.parameters[i].auth == "Au_Basic") {
+					oMark.style = 'font-size:45px;color:gray';
+				}
+				else if (para_json.parameters[i].auth == "Au_Technician") {
+					oMark.style = 'font-size:45px;color:blue';
+				}
+				else if (para_json.parameters[i].auth == "Au_Developper") {
+					oMark.style = 'font-size:45px;color:red';
+				}
+				para_json.parameters[i].tbidx = cateparindex_str;
+				oAddItemInfo.appendChild(oMark);
+
+				//添加名字
+				var oName = document.createElement('name' + i.toString());
+				oName.style = 'margin-left:15px;font-size:20px;color:black';
+				// if (para_json.parameters[i].auth == "Au_Basic") {
+				// 	oName.style = 'margin-left:15px;font-size:20px;color:black';
+				// }
+				// else if (para_json.parameters[i].auth == "Au_Advanced") {
+				// 	oName.style = 'margin-left:15px;font-size:20px;color:brown';
+				// }
+				// else if (para_json.parameters[i].auth == "Au_Technician") {
+				// 	oName.style = 'margin-left:15px;font-size:20px;color:red';
+				// }
+
+				oName.innerHTML = i.toString() + " " + para_json.parameters[i].enumname;// + " "+ para_json.parameters[i].name;
+				oAddItemInfo.appendChild(oName);
+
+
+				var oAddItemDetail = document.createElement('divdetail' + i.toString());
+				oAddItemDetail.className = 'itemDetail';
+				oAddItem.appendChild(oAddItemDetail);
+
+				var oName = document.createElement('indexname' + i.toString());
+				oName.innerHTML = cateparindex_str + " " + para_json.parameters[i].name + "</br>";
+				oAddItemDetail.appendChild(oName);
+
+				var oPhone = document.createElement('pvalue' + i.toString());
+				oPhone.style = 'font-size:15px;';
+				//+ para_json.machinetype[machineid].initial[i]
+				if (para_json.parameters[i].unit == '-')
+					oPhone.innerHTML = para_json.parameters[i].min + "~" + para_json.parameters[i].max
+						+ " "  + "</br>";
+				else
+					oPhone.innerHTML = para_json.parameters[i].min + "~" + para_json.parameters[i].max
+						+ " "  + para_json.parameters[i].unit + "</br>";
+				oAddItemDetail.appendChild(oPhone);
+
+				var oPhone = document.createElement('ptitle' + i.toString());
+				oPhone.style = 'font-size:15px;';
+				oPhone.innerHTML = para_json.parameters[i].title_zh;
+				oAddItemDetail.appendChild(oPhone);
+
+				var oType = document.createElement('ptype' + i.toString());
+				oType.style = 'font-size:15px;';
+				if(para_json.parameters[i].type == "Para_Value")
+				{
+					oType.innerHTML = "123";
+				}
+				else if(para_json.parameters[i].type == "Para_Switch")
+				{
+					oType.innerHTML = "0-1";
+				}
+				else if(para_json.parameters[i].type == "Para_Option")
+				{
+					oType.innerHTML = "0-9";
+				}
+				else if(para_json.parameters[i].type == "Para_Status")
+				{
+					oType.innerHTML = "0/1";
+				}
+				else if(para_json.parameters[i].type == "Para_InputChoices")
+				{
+					oType.innerHTML = "IN";
+				}
+				else if(para_json.parameters[i].type == "Para_OutputChoices")
+				{
+					oType.innerHTML = "OUT";
+				}
+				oType.style = 'background-color:lightgray;font-size:15px;position:absolute;right:2px;botom:2px';
+				oAddItem.appendChild(oType);
+
+			}
+		}
+	}
+
+	var buttonExportJson = document.getElementById("exportjson");
+	buttonExportJson.addEventListener("click", tableToJson, false);
+	function tableToJson() {
+		saveJSON(para_json, "test.json")
+	}
+
+	var buttonElement = document.getElementById("exportcsv");
+	buttonElement.addEventListener("click", tableToExcel, false);
+	function tableToExcel() {
+		//列标题，逗号隔开，每一个逗号就是隔开一个单元格
+		let str = '';
+		//增加\t为了不让表格显示科学计数法或者其他格式
+		for (let i = 0; i < para_json.parameters.length; i++) {
+			if (para_json.parameters[i].title_zh.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].title_zh + '",';
+			}
+			else {
+				str += para_json.parameters[i].title_zh + ',';
+			}
+
+			if (para_json.parameters[i].title_en.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].title_en + '",';
+			}
+			else {
+				str += para_json.parameters[i].title_en + ',';
+			}
+			str += '\n';
+
+			if (para_json.parameters[i].desc_zh.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].desc_zh + '",';
+			}
+			else {
+				str += para_json.parameters[i].desc_zh + ',';
+			}
+
+			if (para_json.parameters[i].desc_en.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].desc_en + '",';
+			}
+			else {
+				str += para_json.parameters[i].desc_en + ',';
+			}
+			str += '\n';
+		}
+		for (let i = 0; i < para_json.errormessage.length; i++) {
+
+			if (para_json.errormessage[i].desc_zh.indexOf(',') != -1) {
+				str += '"' + para_json.errormessage[i].desc_zh + '",';
+			}
+			else {
+				str += para_json.errormessage[i].desc_zh + ',';
+			}
+
+			if (para_json.errormessage[i].desc_en.indexOf(',') != -1) {
+				str += '"' + para_json.errormessage[i].desc_en + '",';
+			}
+			else {
+				str += para_json.errormessage[i].desc_en + ',';
+			}
+			str += '\n';
+		}
+		for (let i = 0; i < para_json.machinetype.length; i++) {
+
+			if (para_json.machinetype[i].type.indexOf(',') != -1) {
+				str += '"' + para_json.machinetype[i].type + '",';
+			}
+			else {
+				str += para_json.machinetype[i].desc_zh + ',';
+			}
+
+			if (para_json.machinetype[i].type.indexOf(',') != -1) {
+				str += '"' + para_json.machinetype[i].type + '",';
+			}
+			else {
+				str += para_json.machinetype[i].desc_en + ',';
+			}
+			str += '\n';
+		}
+		for (let i = 0; i < para_json.panelstrings.length; i++) {
+
+			if (para_json.panelstrings[i].desc_zh.indexOf(',') != -1) {
+				str += '"' + para_json.panelstrings[i].desc_zh + '",';
+			}
+			else {
+				str += para_json.panelstrings[i].desc_zh + ',';
+			}
+
+			if (para_json.panelstrings[i].desc_en.indexOf(',') != -1) {
+				str += '"' + para_json.panelstrings[i].desc_en + '",';
+			}
+			else {
+				str += para_json.panelstrings[i].desc_en + ',';
+			}
+			str += '\n';
+		}
+		//encodeURIComponent解决中文乱码
+		let uri = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(str);
+		//通过创建a标签实现
+		let link = document.createElement("a");
+		link.href = uri;
+		//对下载的文件命名
+		link.download = "String.csv";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+
+	var stringbutton = document.getElementById('stringccode');
+	stringbutton.addEventListener("click", popstringccode, false);
+	function popstringccode() {
+		OpenWindow = window.open("", "newwin", "height=800, width=500,toolbar=no,scrollbars=" + scroll + ",menubar=no");
+		OpenWindow.document.write('typedef enum{</br>');
+		for (var i = 0; i < para_json.panelstrings.length; i++) {
+			if (i == 0) {
+				OpenWindow.document.write(para_json.panelstrings[i].enumname + '= ' + (para_json.parameters.length * 2 + para_json.errormessage.length + para_json.machinetype.length).toString() + ',</br>');
+			}
+			else {
+				OpenWindow.document.write(para_json.panelstrings[i].enumname + ',</br>');
+			}
+		}
+		OpenWindow.document.write('}stringReso;');
+	}
+
+	var parabutton = document.getElementById('paraccode');
+	parabutton.addEventListener("click", popparaccode, false);
+	function popparaccode() {
+		OpenWindow = window.open("", "newwin", "height=800, width=500,toolbar=no,scrollbars=" + scroll + ",menubar=no");
+		OpenWindow.document.write('#include &quotparameter_type.h&quot</br>');
+		OpenWindow.document.write('ParameterInfo paralist['+para_json.parameters.length.toString() +']={</br>');
+		for (var i = 0; i < para_json.parameters.length; i++) {
+			OpenWindow.document.write('{</br>');
+			OpenWindow.document.write(para_json.parameters[i].id + ',</br>');
+			OpenWindow.document.write('&quot' + para_json.parameters[i].name + '&quot,</br>');
+			OpenWindow.document.write(para_json.parameters[i].type + ',</br>');
+			OpenWindow.document.write(para_json.parameters[i].cate + ',</br>');
+			OpenWindow.document.write(para_json.parameters[i].auth + '</br>');
+			OpenWindow.document.write('},</br>');
+		}
+		OpenWindow.document.write('};');
+	}
+
+	var machinebutton = document.getElementById('machineidlist');
+	machinebutton.addEventListener("click", machinelist, false);
+	function machinelist() {
+		OpenWindow = window.open("", "newwin", "height=800, width=500,toolbar=no,scrollbars=" + scroll + ",menubar=no");
+		OpenWindow.document.write('#dfeine PARA_AMOUNT_MACHINE ' + para_json.machinetype.length.toString() + '</br>');
+		OpenWindow.document.write('MACHINE_TYPE machinetype_id[PARA_AMOUNT_MACHINE] ={</br>');
+		for (var i = 0; i < para_json.machinetype.length; i++) {
+			OpenWindow.document.write('{' + para_json.machinetype[i].id + ',"' + para_json.machinetype[i].type + '"},');
+			//if (i % 10 == 9) {
+				OpenWindow.document.write('</br>');
+			//}
+		}
+		OpenWindow.document.write('};');
+	}
+
+	var errorcodebutton = document.getElementById('errorcodelist');
+	errorcodebutton.addEventListener("click", errorlist, false);
+	function errorlist() {
+		OpenWindow = window.open("", "newwin", "height=800, width=500,toolbar=no,scrollbars=" + scroll + ",menubar=no");
+		OpenWindow.document.write('int16_t error_code={</br>');
+		for (var i = 0; i < para_json.errormessage.length; i++) {
+			OpenWindow.document.write(para_json.errormessage[i].errorcode + ',');
+			if (i % 10 == 9) {
+				OpenWindow.document.write('</br>');
+			}
+		}
+		OpenWindow.document.write('};');
+	}
+
+	function copy(obj) {
+		var newobj = obj.constructor === Array ? [] : {};
+		if (typeof obj !== 'object') {
+			return;
+		}
+		for (var i in obj) {
+			newobj[i] = typeof obj[i] === 'object' ? copy(obj[i]) : obj[i];
+		}
+		return newobj
+	}
+
+	var insertparbutton = document.getElementById('insertparameter');
+	insertparbutton.addEventListener('click', insertonepar, false);
+	function insertonepar() {
+		if (selectItemIndex != -1) {
+			var cccc = confirm("继续添加吗?");
+			if (cccc == 1) {
+				var para_temp = para_json.parameters[selectItemIndex];
+				para_json.parameters.splice(selectItemIndex, 0, copy(para_temp));
+				loadparbycate();
+			}
+		}
+	}
+
+	var delparbutton = document.getElementById('deleteparameter');
+	delparbutton.addEventListener('click', delonepar, false);
+	function delonepar() {
+		if (selectItemIndex != -1) {
+			var cccc = confirm("继续删除吗?");
+			if (cccc == 1) {
+				para_json.parameters.splice(selectItemIndex, 1);
+				loadparbycate();
+			}
+		}
+	}
+
+	var savechangebutton = document.getElementById('savechanges');
+	savechangebutton.addEventListener('click', savethechanges, false);
+	function savethechanges() {
+
+		var cccc = confirm("保存修改吗?");
+		if (cccc == 1) {
+			setJsonLocalStorage(para_json);
+		}
+	}
+
+	function compare(propertyName) {
+		return function (object1, object2) {
+			var value1 = object1[propertyName];
+			var value2 = object2[propertyName];
+			if (value2 > value1) {
+				return -1;
+			} else if (value2 < value1) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+
+	}
+	var sortbutton = document.getElementById('sortparameters');
+	sortbutton.addEventListener('click', sorttheparameters, false);
+	function sorttheparameters() {
+
+		var cccc = confirm("进行排序吗?");
+		if (cccc == 1) {
+			para_json.parameters.sort(compare("tbidx"))
+			loadparbycate();
+		}
+	}
+
+	function user_loadparbycate() {
+		var tab = document.getElementById('shareSateList');
+		tab.innerHTML = "";
+		var tab = document.getElementById('para_table');
+		tab.innerHTML = "";
+		var tr = document.createElement('tr');
+		tab.appendChild(tr);
+		var td = document.createElement("td");
+		td.innerHTML = selectLanguage ? 'Index' : '序号';
+		td.className = 'th0';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = selectLanguage ? 'Disp' : '显示名';
+		td.className = 'th1';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = selectLanguage ? 'Formal' : '老名称';
+		td.className = 'th2';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = selectLanguage ? 'Enum' : '枚举名';
+		td.className = 'th3';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = selectLanguage ? 'Title' : '标题';
+		td.className = 'th4';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = selectLanguage ? 'Range' : '范围';
+		td.className = 'th5';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = selectLanguage ? 'Default' : '缺省';
+		td.className = 'th6';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = selectLanguage ? 'Value' : '参数值';
+		td.className = 'th7';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = selectLanguage ? 'Unit' : '单位';
+		td.className = 'th8';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = selectLanguage ? 'Auth' : '权限';
+		td.className = 'th9';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = selectLanguage ? 'Description' : '描述';
+		td.className = 'th10';
+		tr.appendChild(td);
+		var j = 0;
+		var selectedCate = document.getElementById("category").value;//获取读取的File对象
+		var machineid = document.getElementById("machinetype").selectedIndex;
+		for (var i = 0; i < para_json.parameters.length; i++) {
+			var cate = para_json.parameters[i].cate;
+			var cate1 = selectedCate.split(' ')[0];
+			if (cate1 == cate || selectedCate.indexOf('All') != -1) {
+				var tr = document.createElement("tr" + i.toString());
+				tab.appendChild(tr);
+				var trElement = document.getElementsByTagName("tr" + i.toString());
+
+				var td = document.createElement("td");
+				td.innerHTML = i.toString();//para_json.parameters[i].id;
+				if (j % 2 == 0)
+					td.className = 'td0odd';
+				else
+					td.className = 'td0eve';
+				tr.appendChild(td);
+
+				var td = document.createElement("td");
+				td.innerHTML = para_json.parameters[i].tbidx;
+				if (j % 2 == 0)
+					td.className = 'td1odd';
+				else
+					td.className = 'td1eve';
+				tr.appendChild(td);
+
+				var td = document.createElement("td");
+				td.innerHTML = para_json.parameters[i].name;
+				if (j % 2 == 0)
+					td.className = 'td2odd';
+				else
+					td.className = 'td2eve';
+				tr.appendChild(td);
+
+
+				var td = document.createElement("td");
+				td.innerHTML = para_json.parameters[i].enumname;
+				if (j % 2 == 0)
+					td.className = 'td3odd';
+				else
+					td.className = 'td3eve';
+				tr.appendChild(td);
+				var td = document.createElement("td");
+				td.innerHTML = selectLanguage ? (para_json.parameters[i].title_en) : (para_json.parameters[i].title_zh);
+				if (j % 2 == 0)
+					td.className = 'td4odd';
+				else
+					td.className = 'td4eve';
+				tr.appendChild(td);
+				var td = document.createElement("td");
+				td.innerHTML = para_json.parameters[i].min + '-' + para_json.parameters[i].max;
+				if (j % 2 == 0)
+					td.className = 'td5odd';
+				else
+					td.className = 'td5eve';
+				tr.appendChild(td);
+				var td = document.createElement("td");
+				var strbuf = para_json.parameters[i].initial.split(',');
+				td.innerHTML = strbuf[machineid];
+				if (j % 2 == 0)
+					td.className = 'td6odd';
+				else
+					td.className = 'td6eve';
+				tr.appendChild(td);
+				var td = document.createElement("td");
+				if (parameterarray) {
+					td.innerHTML = parameterarray[i + 79];
+				}
+				if (j % 2 == 0)
+					td.className = 'td7odd';
+				else
+					td.className = 'td7eve';
+				if (parameterarray) {
+					if (parameterarray[i + 79] != para_json.parameters[i].initial.split(',')[machineid]) {
+						td.className = 'td6changed';
+					}
+				}
+				tr.appendChild(td);
+
+				var td = document.createElement("td");
+				td.innerHTML = para_json.parameters[i].unit;
+				if (j % 2 == 0)
+					td.className = 'td8odd';
+				else
+					td.className = 'td8eve';
+				tr.appendChild(td);
+
+				var td = document.createElement("td");
+				if (para_json.parameters[i].auth == "Au_Basic")
+					td.innerHTML = selectLanguage ? "Operator" : "操作者";
+				else if (para_json.parameters[i].auth == "Au_Technician")
+					td.innerHTML = selectLanguage ? "Technician" : "技术员";
+				else if (para_json.parameters[i].auth == "Au_Developper")
+					td.innerHTML = selectLanguage ? "Developer" : "开发者";
+				if (j % 2 == 0)
+					td.className = 'td9odd';
+				else
+					td.className = 'td9eve';
+				tr.appendChild(td);
+
+				var td = document.createElement("td");
+				if (para_json.parameters[i].type == 'Para_Option') {
+					var sssoption = selectLanguage ? (para_json.parameters[i].desc_en.split(';')) : (para_json.parameters[i].desc_zh.split(';'));
+					var sss = '';
+					for (var kk = 0; kk < sssoption.length; kk++) {
+						sss += sssoption[kk];
+						sss += '</br>';
+					}
+					td.innerHTML = sss;
+				}
+				else {
+					td.innerHTML = selectLanguage ? (para_json.parameters[i].desc_en) : (para_json.parameters[i].desc_zh);
+				}
+				if (j % 2 == 0)
+					td.className = 'td10odd';
+				else
+					td.className = 'td10eve';
+				tr.appendChild(td);
+				j++;
+			}
+		}
+	}
+</script>

@@ -1,0 +1,299 @@
+.infoitem
+{
+width:1000px;
+border:'2px solid #DDD';
+font-size:120%;
+margin-top:10px;
+margin-bottom:10px;
+margin-left:10px;
+margin-right:10px;
+word-wrap: break-word;
+border-radius: 5px;
+}
+.errormessageitem
+{
+width:1000px;
+border:'2px solid #DDD';
+font-size:100%;
+margin-top:5px;
+margin-bottom:5px;
+margin-left:10px;
+margin-right:10px;
+word-wrap: break-word;
+border-radius: 5px;
+}
+.machinetypeitem
+{
+width:300px;
+border:'2px solid #DDD';
+font-size:100%;
+margin-top:10px;
+margin-bottom:10px;
+margin-left:10px;
+margin-right:10px;
+word-wrap: break-word;
+border-radius: 5px;
+}
+.paraitem
+{
+width:150px;
+border:'2px solid #DDD';
+font-size:90%;
+margin-top:10px;
+margin-bottom:10px;
+margin-left:10px;
+margin-right:10px;
+word-wrap: break-word;
+border-radius: 5px;
+}
+
+.th0
+{
+    width:50px;
+    background-color: #3366FF;
+    text-align: center;
+}
+.th1
+{
+    width:50px;
+    background-color: #3366FF;
+    text-align: center;
+}
+.th2
+{
+    width:50px;
+    background-color: #3366FF;
+    text-align: center;
+}
+.th3
+{
+    width:150px;
+    background-color: #3366FF;
+    text-align: center;
+}
+.th4
+{
+    width:200px;
+    background-color: #3366FF;
+    text-align: center;
+}
+.th5
+{
+    width:100px;
+    background-color: #3366FF;
+    text-align: center;
+}
+.th6
+{
+    width:100px;
+    background-color: #3366FF;
+    text-align: center;
+}
+.th7
+{
+    width:100px;
+    background-color: #3366FF;
+    text-align: center;
+}
+.th8
+{
+    width:100px;
+    background-color: #3366FF;
+    text-align: center;
+}
+.th9
+{
+    width:100px;
+    background-color: #3366FF;
+    text-align: center;
+}
+.th10
+{
+    width:800px;
+    background-color: #3366FF;
+    text-align: center;
+}
+.td0odd
+{
+    width:50px;
+    background-color: snow;
+    text-align: center;
+}
+.td1odd
+{
+    width:50px;
+    background-color: snow;
+    text-align: center;
+}
+.td2odd
+{
+    width:50px;
+    background-color: snow;
+    text-align: center;
+}
+.td3odd
+{
+    width:150px;
+    background-color: snow;
+    text-align: center;
+}
+.td4odd
+{
+    width:200px;
+    background-color: snow;
+    text-align: center;
+}
+.td5odd
+{
+    width:100px;
+    background-color: snow;
+    text-align: center;
+}
+.td6odd
+{
+    width:100px;
+    background-color: snow;
+    text-align: center;
+}
+.td7odd
+{
+    width:100px;
+    background-color: snow;
+    text-align: center;
+}
+.td8odd
+{
+    width:100px;
+    background-color: snow;
+    text-align: center;
+}
+.td9odd
+{
+    width:100px;
+    background-color: snow;
+    text-align: center;
+}
+.td10odd
+{
+    width:800px;
+    background-color: snow;
+}
+.td0eve
+{
+    width:50px;
+    background-color: #E6F3F9;
+    text-align: center;
+}
+.td1eve
+{
+    width:50px;
+    background-color: #E6F3F9;
+    text-align: center;
+}
+.td2eve
+{
+    width:50px;
+    background-color: #E6F3F9;
+    text-align: center;
+}
+.td3eve
+{
+    width:150px;
+    background-color: #E6F3F9;
+    text-align: center;
+}
+.td4eve
+{
+    width:200px;
+    background-color: #E6F3F9;
+    text-align: center;
+}
+.td5eve
+{
+    width:100px;
+    background-color: #E6F3F9;
+    text-align: center;
+}
+.td6eve
+{
+    width:100px;
+    background-color: #E6F3F9;
+    text-align: center;
+}
+.td6changed
+{
+    width:100px;
+    background-color: red;
+    text-align: center;
+}
+.td7eve
+{
+    width:100px;
+    background-color: #E6F3F9;
+    text-align: center;
+}
+.td8eve
+{
+    width:100px;
+    background-color: #E6F3F9;
+    text-align: center;
+}
+.td9eve
+{
+    width:100px;
+    background-color: #E6F3F9;
+    text-align: center;
+}
+.td10eve
+{
+    width:800px;
+    background-color: #E6F3F9;
+}
+
+/*分享状态样式*/
+.shareBox .shareState{
+    width: 100%;
+    position: relative;
+    overflow: hidden;    
+}
+.shareBox .shareState .shareSateList{
+    width: 100%;
+	user-select: none;
+	margin-left:20px;
+}
+
+.shareBox .shareState .item{  /*名片样式*/
+    width: 175px;
+    height: 145px;
+    float: left;
+    border:1px solid #dfdfdf;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    position: relative;
+	/*background-image:linear-gradient(#d3cfee, #d5d6da);*/
+	background-color: rgb(230, 232, 233);
+}
+/*.shareBox .shareState .item:hover{
+    border:1px solid #f3f1f0;
+    cursor: pointer;
+    background-image:url(../imgs/delete.png);
+    background-repeat: no-repeat;
+	background-color: rgb(97, 124, 241);
+}*/
+.shareBox .shareState .itemInfo{   
+    position: absolute;
+    top: 5px;
+    left: 5px;
+	margin-bottom:5px;
+	display: flex;
+	align-items: center;
+	text-align: center;
+	/*border:2px solid #f3f1f0;*/
+	width:90%;
+}
+.shareBox .shareState .itemDetail{   
+    position: absolute;
+    top: 60px;
+    left: 5px;
+}
+
