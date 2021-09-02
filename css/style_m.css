@@ -1,223 +1,235 @@
-.classitem
+.cateitem
 {
-width:1000px;
+width:100%;
 border:'2px solid #DDD';
-font-size:100%;
-margin-top:5px;
-margin-bottom:5px;
-margin-left:10px;
-margin-right:10px;
-word-wrap: break-word;
-border-radius: 5px;
-}
-.machinetypeitem
-{
-width:300px;
-border:'2px solid #DDD';
-font-size:100%;
-margin-top:10px;
-margin-bottom:10px;
-margin-left:10px;
-margin-right:10px;
-word-wrap: break-word;
-border-radius: 5px;
-}
-.paraitem
-{
-width:150px;
-border:'2px solid #DDD';
-font-size:90%;
-margin-top:10px;
-margin-bottom:10px;
-margin-left:10px;
-margin-right:10px;
+font-size:70%;
+margin-top:2px;
+margin-bottom:2px;
+margin-left:5px;
+margin-right:5px;
 word-wrap: break-word;
 border-radius: 5px;
 }
 
 .th0
 {
-    width:50px;
+    width:5%;
     background-color: #3366FF;
     text-align: center;
-}
-.th1
-{
-    width:50px;
-    background-color: #3366FF;
-    text-align: center;
-}
-.th3
-{
-    width:150px;
-    background-color: #3366FF;
-    text-align: center;
-}
-.th4
-{
-    width:200px;
-    background-color: #3366FF;
-    text-align: center;
-}
-.th5
-{
-    width:100px;
-    background-color: #3366FF;
-    text-align: center;
-}
-.th6
-{
-    width:100px;
-    background-color: #3366FF;
-    text-align: center;
-}
-.th7
-{
-    width:100px;
-    background-color: #3366FF;
-    text-align: center;
-}
-.th8
-{
-    width:100px;
-    background-color: #3366FF;
-    text-align: center;
-}
-.th9
-{
-    width:100px;
-    background-color: #3366FF;
-    text-align: center;
-}
-.th10
-{
-    width:800px;
-    background-color: #3366FF;
-    text-align: center;
+	font-size:60%;
 }
 .td0odd
 {
-    width:50px;
+    width:5%;
     background-color: snow;
     text-align: center;
-}
-.td1odd
-{
-    width:50px;
-    background-color: snow;
-    text-align: center;
-}
-.td3odd
-{
-    width:150px;
-    background-color: snow;
-    text-align: center;
-}
-.td4odd
-{
-    width:200px;
-    background-color: snow;
-    text-align: center;
-}
-.td5odd
-{
-    width:100px;
-    background-color: snow;
-    text-align: center;
-}
-.td6odd
-{
-    width:100px;
-    background-color: snow;
-    text-align: center;
-}
-.td7odd
-{
-    width:100px;
-    background-color: snow;
-    text-align: center;
-}
-.td8odd
-{
-    width:100px;
-    background-color: snow;
-    text-align: center;
-}
-.td9odd
-{
-    width:100px;
-    background-color: snow;
-    text-align: center;
-}
-.td10odd
-{
-    width:800px;
-    background-color: snow;
+	font-size:60%;
 }
 .td0eve
 {
-    width:50px;
+    width:5%;
     background-color: #E6F3F9;
     text-align: center;
+	font-size:60%;
+}
+
+
+.th1
+{
+    width:5%;
+    background-color: #3366FF;
+    text-align: center;
+	font-size:60%;
+}
+.td1odd
+{
+    width:5%;
+    background-color: snow;
+    text-align: center;
+	font-size:60%;
 }
 .td1eve
 {
-    width:50px;
+    width:5%;
     background-color: #E6F3F9;
     text-align: center;
+	font-size:60%;
+}
+
+.th3
+{
+    width:5%;
+    background-color: #3366FF;
+    text-align: center;
+	font-size:60%;
+}
+.td3odd
+{
+    width:5%;
+    background-color: snow;
+    text-align: center;
+	font-size:60%;
 }
 .td3eve
 {
-    width:150px;
+    width:5%;
     background-color: #E6F3F9;
     text-align: center;
+	font-size:60%;
+}
+
+.th4
+{
+    width:10%;
+    background-color: #3366FF;
+    text-align: center;
+	font-size:60%;
+}
+.td4odd
+{
+    width:10%;
+    background-color: snow;
+    text-align: center;
+	font-size:60%;
 }
 .td4eve
 {
-    width:200px;
+    width:10%;
     background-color: #E6F3F9;
     text-align: center;
+	font-size:60%;
+}
+
+.th5
+{
+    width:8%;
+    background-color: #3366FF;
+    text-align: center;
+	font-size:60%;
+}
+.td5odd
+{
+    width:8%;
+    background-color: snow;
+    text-align: center;
+	font-size:60%;
 }
 .td5eve
 {
-    width:100px;
+    width:8%;
     background-color: #E6F3F9;
     text-align: center;
+	font-size:60%;
+}
+.th6
+{
+    width:5%;
+    background-color: #3366FF;
+    text-align: center;
+	font-size:60%;
+}
+.td6odd
+{
+    width:5%;
+    background-color: snow;
+    text-align: center;
+	font-size:60%;
 }
 .td6eve
 {
-    width:100px;
+    width:5%;
     background-color: #E6F3F9;
     text-align: center;
+	font-size:60%;
 }
 .td6changed
 {
-    width:100px;
+    width:5%;
     background-color: red;
     text-align: center;
+	font-size:60%;
+}
+.th7
+{
+    width:5%;
+    background-color: #3366FF;
+    text-align: center;
+	font-size:60%;
+}
+.td7odd
+{
+    width:5%;
+    background-color: snow;
+    text-align: center;
+	font-size:60%;
 }
 .td7eve
 {
-    width:100px;
+    width:5%;
     background-color: #E6F3F9;
     text-align: center;
+	font-size:60%;
+}
+.th8
+{
+    width:5%;
+    background-color: #3366FF;
+    text-align: center;
+	font-size:60%;
+}
+.td8odd
+{
+    width:5%;
+    background-color: snow;
+    text-align: center;
+	font-size:60%;
 }
 .td8eve
 {
-    width:100px;
+    width:5%;
     background-color: #E6F3F9;
     text-align: center;
+	font-size:60%;
+}
+.th9
+{
+    width:5%;
+    background-color: #3366FF;
+    text-align: center;
+	font-size:60%;
+}
+.td9odd
+{
+    width:5%;
+    background-color: snow;
+    text-align: center;
+	font-size:60%;
 }
 .td9eve
 {
-    width:100px;
+    width:5%;
     background-color: #E6F3F9;
     text-align: center;
+	font-size:60%;
+}
+.th10
+{
+    width:25%;
+    background-color: #3366FF;
+    text-align: center;
+	font-size:60%;
+}
+.td10odd
+{
+    width:25%;
+    background-color: snow;
+	font-size:60%;
 }
 .td10eve
 {
-    width:800px;
+    width:25%;
     background-color: #E6F3F9;
+	font-size:60%;
 }
 
 /*分享状态样式*/

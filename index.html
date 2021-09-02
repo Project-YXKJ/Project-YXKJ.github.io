@@ -3,53 +3,69 @@
 	<meta id="viewport" name="viewport"
 		content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<style type="text/css">
-		@import url("css/style.css");
 		@import url("css/font_style.css");
 	</style>
-	<title>GC4000 parameters</title>
+	<title>Parameters viewer</title>
 </head>
+<script>
+	var language;
+	if ((navigator.userAgent.match(/(ipad|iphone|ipod|Android|ios)/i))) {
+		document.write("<link href='css/style_m.css' rel = 'stylesheet'>");
+		console.log("Mobile");
+	}
+	else {
+		document.write("<link href='css/style.css' rel = 'stylesheet'>");
+		console.log("PC");
+	}
+	language = (navigator.browserLanguage || navigator.language).toLowerCase()
+	console.log(language);
+</script>
 
 <div id="loadpara" style="display:flex;align-items:center;">
-	<div style = "margin-right:20px">
-		<text class="icon-undertable" style="font-size:150px"></text>
-		<text class="icon-motorcover1" style="font-size:150px"></text>
+	<div style="margin-right:20px">
+		<text class="icon-undertable" style="font-size:800%"></text>
 	</div>
-	<div style="display:flex;flex-direction:column;">
-		<h1>Parameter list</h1>
+	<div style="display:flex;flex-direction: column;">
+		<h1>Parameter viewer</h1>
 		<text style="font-size:100%;margin-top:10px;" id="version"></text>
-		<select id="language" style="margin-top:10px"></select>
-		<text style="margin-top:10px">Import</text>
+		<text style="margin-top:10px">Import a json</text>
 		<input type="file" id="jsonfile" accept=".json" style="margin-top:10px" />
 	</div>
+
 </div>
 
-<!--<input type="file" id="para"  accept="application/para_json"/>-->
-
 <div style="margin-top:10px;margin-bottom:10px;">
-	<select id="machinetype">
-	</select>
-</div>
-<div style="margin-top:10px;margin-bottom:10px;">
-	<select id="errormsg">
-	</select>
-</div>
-<div style="margin-top:10px;margin-bottom:10px;">
-	<select id="category">
+	<h3>Troubleshooting</h3>
+	<select class='cateitem' id="errormsg">
 	</select>
 </div>
 
-
-<div style="margin-top:10px;margin-bottom:10px;">
-	<text>View parameter</text>
-	<input type="file" id="parafile" accept=".par" style="margin-left:10px;" />
+<div>
+	<h3>View data</h3>
+	<div style="margin-top:10px;margin-bottom:10px;">
+		<text>Parameter</text>
+		<input type="file" id="parafile" accept=".par" style="margin-left:10px;" />
+	</div>
+	<div style="margin-top:10px;margin-bottom:10px;">
+		<text>Program seam</text>
+		<input type="file" id="sewprogramfile" accept=".sew" style="margin-left:10px;" />
+	</div>
 </div>
 
-<tabel id="para_table">
-</tabel>
+<div>
+	<h3>List</h3>
+	<div style="margin-top:10px;margin-bottom:10px;">
+		<select class='cateitem' id="category">
+		</select>
+	</div>
+	<tabel id="para_table">
+	</tabel>
+</div>
 
 <script>
 	var para_json;
 	var parameterarray;
+	var sewprogramarray;
 	var selectLanguage;
 	var selectmode;
 	var editState = 0;
@@ -63,42 +79,14 @@
 	inputElement.addEventListener("change", handleFiles, false);
 	var inputElement = document.getElementById("parafile");
 	inputElement.addEventListener("change", handleFiles1, false);
-	var selobj = document.getElementById('language');
-	selobj.add(new Option("中文"));
-	selobj.add(new Option("English"));
-	selobj.addEventListener("change", ChangeLanugage, false);
-	var language = localStorage.getItem("lan");
-	if (language == "zh") {
-		//alert("zh");
-		selectLanguage = false;
-		selobj.options[0].selected = true;
+	var inputElement = document.getElementById("sewprogramfile");
+	inputElement.addEventListener("change", handleFiles2, false);
+
+	if (language.indexOf('zh')) {
+		selectLanguage = true;
 	}
 	else {
-		//alert("en");
-		selectLanguage = true;
-		selobj.options[1].selected = true;
-	}
-	var viewmode = "lookup";
-	selectmode = true;
-
-	function ChangeLanugage() {
-		var select = document.getElementById('language');
-		var selectIdx = 0;
-		if (select.options[0].selected == true) {
-			selectLanguage = false;
-			user_loadparbycate();
-			if (!!localStorage) {
-				localStorage.setItem("lan", "zh");
-			}
-		}
-		else {
-			selectLanguage = true;
-			user_loadparbycate();
-
-			if (!!localStorage) {
-				localStorage.setItem("lan", "en");
-			}
-		}
+		selectLanguage = false;
 	}
 
 	function SerachInoutCommentIndex() {
@@ -145,6 +133,17 @@
 		e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
 		a.dispatchEvent(e)
 	}
+	function handleFiles2() {
+		var parafile = document.getElementById("sewprogramfile").files[0];//获取读取的File对象
+		var reader = new FileReader();//这里是核心！！！读取操作就是由它完成的。
+		//reader1.readAsArrayBuffer(selectedFile);//读取文件的内容
+		reader.readAsArrayBuffer(parafile);
+		reader.onload = function () {
+			sewprogramarray = new Uint16Array(this.result);
+			//console.log(parameter);
+			loadsewprogram();
+		}
+	}
 	function handleFiles1() {
 		var parafile = document.getElementById("parafile").files[0];//获取读取的File对象
 		var reader = new FileReader();//这里是核心！！！读取操作就是由它完成的。
@@ -162,7 +161,7 @@
 		var name = selectedFile.name;//读取选中文件的文件名
 		var size = selectedFile.size;//读取选中文件的大小
 		//   var div1;
-		machinetype.length = 0;
+		//machinetype.length = 0;
 		console.log("文件名:" + name + "大小：" + size);
 		var reader1 = new FileReader();//这里是核心！！！读取操作就是由它完成的。
 		//reader1.readAsArrayBuffer(selectedFile);//读取文件的内容
@@ -180,19 +179,11 @@
 			}
 			var selobj = document.getElementById('errormsg');
 			for (var i = 0; i < para_json.errormessage.length; i++) {
-				if (language == 'zh')
+				if (language == 'zh-cn')
 					selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_zh));
 				else
 					selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_en));
 			}
-			var selobj = document.getElementById('machinetype');
-			for (var i = 0; i < para_json.machinetype.length; i++) {
-				selobj.add(new Option(para_json.machinetype[i].id + "  " + para_json.machinetype[i].type));
-			}
-			//var selobj = document.getElementById('panelstring');
-			//for (var i = 0; i < para_json.panelstrings.length; i++) {
-			//	selobj.add(new Option(para_json.panelstrings[i].enumname + "  " + para_json.panelstrings[i].desc_zh));
-			//}
 			SerachInoutCommentIndex();
 			user_loadparbycate();
 			//var str = JSON.stringify(para_json);
@@ -210,31 +201,20 @@
 		selobj.innerHTML = "Version:" + para_json.Info.version + "  " + para_json.Info.desc_zh;
 		var selobj = document.getElementById('category');
 		for (var key in para_json.category) {
-			if (language == 'zh')
+			if (language == 'zh-cn')
 				selobj.add(new Option(para_json.category[key].enumname + "  " + para_json.category[key].desc_zh));
 			else selobj.add(new Option(para_json.category[key].enumname));
 		}
 		var selobj = document.getElementById('errormsg');
 		for (var i = 0; i < para_json.errormessage.length; i++) {
-			if (language == 'zh')
+			if (language == 'zh-cn')
 				selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_zh));
 			else selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_en));
 		}
-		var selobj = document.getElementById('machinetype');
-		for (var i = 0; i < para_json.machinetype.length; i++) {
-			selobj.add(new Option(para_json.machinetype[i].id + "  " + para_json.machinetype[i].type));
-		}
-		//var selobj = document.getElementById('panelstring');
-		//for (var i = 0; i < para_json.panelstrings.length; i++) {
-		//	selobj.add(new Option(para_json.panelstrings[i].enumname + "  " + para_json.panelstrings[i].desc_zh));
-		//}
 		user_loadparbycate();
 	}
 
 	var selectElement = document.getElementById("category");
-	selectElement.addEventListener("change", user_loadparbycate, false);
-
-	var selectElement = document.getElementById("machinetype");
 	selectElement.addEventListener("change", user_loadparbycate, false);
 
 	function padd(num, n) {
@@ -270,16 +250,41 @@
 		}
 
 	}
-	//var sortbutton = document.getElementById('sortparameters');
-	//sortbutton.addEventListener('click', sorttheparameters, false);
-	//function sorttheparameters() {
 
-	//		var cccc = confirm("进行排序吗?");
-	//	if (cccc == 1) {
-	//		para_json.parameters.sort(compare("tbidx"))
-	//		loadparbycate();
-	//	}
-	//}
+	function loadsewprogram() {
+		var sss = "";
+		for (var i = 0; i < 7; i++) {
+			sss += "P00" + (3 + i).toString() + "</br>";
+			for (var j = 0; j < 25; j++) {
+				if (sewprogramarray[13 + i * 272 + j * 10 + 8] != 0) {
+					sss += "S" + (j+1).toString() + " Start:";
+					if (sewprogramarray[13 + i * 272 + j * 10 + 0] == 1) {
+						sss += 'A ' + sewprogramarray[13 + i * 272 + j * 10 + 1].toString() + ' ' + 'B ' + sewprogramarray[13 + i * 272 + j * 10 + 2].toString() + ' ' + 'Section ' + sewprogramarray[13 + i * 272 + j * 10 + 3].toString();
+					}
+					else sss += "none";
+					sss += ' Mid stitches:' + sewprogramarray[13 + i * 272 + j * 10 + 8].toString();
+					sss += ' End:';
+					if (sewprogramarray[13 + i * 272 + j * 10 + 4] == 1) {
+						sss += 'C ' + sewprogramarray[13 + i * 272 + j * 10 + 5].toString() + ' ' + 'D ' + sewprogramarray[13 + i * 272 + j * 10 + 6].toString() + ' ' + 'Section ' + sewprogramarray[13 + i * 272 + j * 10 + 7].toString();
+					}
+					else sss += "none";
+					sss += " Trim :"
+					if (sewprogramarray[13 + i * 272 + j * 10 + 9] == 1) {
+						sss += "ON";
+					}
+					else sss += "OFF";
+					sss += '</br>';
+				}
+				else {
+
+					break;
+				}
+			}
+		}
+		//console.log(sss);
+		OpenWindow = window.open("", "newwin", "height=800, width=600,toolbar=no,scrollbars=" + scroll + ",menubar=no");
+		OpenWindow.document.write(sss);
+	}
 
 	function user_loadparbycate() {
 		//var tab = document.getElementById('shareSateList');
@@ -289,7 +294,7 @@
 		var tr = document.createElement('tr');
 		tab.appendChild(tr);
 		var td = document.createElement("td");
-		td.innerHTML = selectLanguage ? 'Index' : '序号';
+		td.innerHTML = selectLanguage ? 'Id' : '序号';
 		td.className = 'th0';
 		tr.appendChild(td);
 		//	var td = document.createElement("td");
@@ -309,7 +314,10 @@
 		td.className = 'th4';
 		tr.appendChild(td);
 		var td = document.createElement("td");
-		td.innerHTML = selectLanguage ? 'Range' : '范围';
+		if (parameterarray)
+			td.innerHTML = selectLanguage ? 'Range' : '范围';
+		else
+			td.innerHTML = selectLanguage ? 'Range(Ref)' : '范围(参考)';
 		td.className = 'th5';
 		tr.appendChild(td);
 		var td = document.createElement("td");
@@ -334,7 +342,7 @@
 		tr.appendChild(td);
 		var j = 0;
 		var selectedCate = document.getElementById("category").value;//获取读取的File对象
-		var machineid = document.getElementById("machinetype").selectedIndex;
+		//var machineid = document.getElementById("machinetype").selectedIndex;
 		for (var i = 0; i < para_json.parameters.length; i++) {
 			var cate = para_json.parameters[i].cate;
 			var cate1 = selectedCate.split(' ')[0];
@@ -350,14 +358,6 @@
 				else
 					td.className = 'td0eve';
 				tr.appendChild(td);
-
-				//var td = document.createElement("td");
-				//td.innerHTML = para_json.parameters[i].tbidx;
-				//if (j % 2 == 0)
-				//	td.className = 'td1odd';
-				//else
-				//	td.className = 'td1eve';
-				//tr.appendChild(td);
 
 				var td = document.createElement("td");
 				td.innerHTML = para_json.parameters[i].name;
@@ -383,15 +383,23 @@
 					td.className = 'td4eve';
 				tr.appendChild(td);
 				var td = document.createElement("td");
-				td.innerHTML = para_json.parameters[i].min + '-' + para_json.parameters[i].max;
+				if (parameterarray) {
+					td.innerHTML = parameterarray[i + 867] + '-' + parameterarray[i + 473];
+				}
+				else {
+					td.innerHTML = para_json.parameters[i].min + '-' + para_json.parameters[i].max;
+				}
 				if (j % 2 == 0)
 					td.className = 'td5odd';
 				else
 					td.className = 'td5eve';
 				tr.appendChild(td);
 				var td = document.createElement("td");
-				var strbuf = para_json.parameters[i].initial.split(',');
-				td.innerHTML = strbuf[machineid];
+				if (parameterarray) {
+					td.innerHTML = parameterarray[i + 1261];
+				}
+				//var strbuf = para_json.parameters[i].initial.split(',');
+				//td.innerHTML = strbuf[machineid];
 				if (j % 2 == 0)
 					td.className = 'td6odd';
 				else
@@ -406,7 +414,7 @@
 				else
 					td.className = 'td7eve';
 				if (parameterarray) {
-					if (parameterarray[i + 79] != para_json.parameters[i].initial.split(',')[machineid]) {
+					if (parameterarray[i + 79] != parameterarray[i + 1261]) {
 						td.className = 'td6changed';
 					}
 				}
@@ -425,7 +433,7 @@
 					td.innerHTML = selectLanguage ? "Basic" : "操作者";
 				else if (para_json.parameters[i].auth == "Au_Technician")
 					td.innerHTML = selectLanguage ? "Technician" : "技术员";
-				else if (para_json.parameters[i].auth == "Au_Developper")
+				else if (para_json.parameters[i].auth == "Au_Developer")
 					td.innerHTML = selectLanguage ? "Developer" : "开发者";
 				if (j % 2 == 0)
 					td.className = 'td9odd';
