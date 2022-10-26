@@ -21,7 +21,7 @@
 	console.log(language);
 </script>
 
-<div id="loadpara" style="display:flex;align-items:center;">
+<div id="loadpara" style="display:flex;align-items:center;display:none;">
 	<div style="margin-right:20px">
 		<text class="icon-undertable" style="font-size:800%"></text>
 	</div>
@@ -29,18 +29,21 @@
 		<h1>Parameter viewer</h1>
 		<text style="font-size:100%;margin-top:10px;" id="version"></text>
 		<text style="margin-top:10px">Import a json</text>
-		<input type="file" id="jsonfile" accept=".json" style="margin-top:10px" />
 	</div>
-
 </div>
-
-<div style="margin-top:10px;margin-bottom:10px;">
+<div style="margin-top:10px;margin-bottom:10px;display:none;">
 	<h3>Troubleshooting</h3>
 	<select class='cateitem' id="errormsg">
 	</select>
 </div>
-
-<div>
+<div style="display:flex;align-items:center;">
+	<h1>YSC-90A0</h1>
+	<image id="flag_img" style="width:32px;margin-left:20px;" src="images\china_flag.png"></image>
+	<select id="language" style="margin-left:10px;"></select>
+	<input type="file" id="jsonfile" accept=".json" style="margin-left:50px" />
+	<button style="margin-left: 10px;" id="exportcsv">导出csv文件</button>
+</div>
+<div style="display:none;">
 	<h3>View data</h3>
 	<div style="margin-top:10px;margin-bottom:10px;">
 		<text>Parameter</text>
@@ -53,12 +56,18 @@
 </div>
 
 <div>
-	<h3>List</h3>
+	<h3>Parameter list</h3>
 	<div style="margin-top:10px;margin-bottom:10px;">
 		<select class='cateitem' id="category">
 		</select>
 	</div>
 	<tabel id="para_table">
+	</tabel>
+	<h3>Trouble shooting</h3>
+	<tabel id="errmsg_table">
+	</tabel>
+	<h3>String list</h3>
+	<tabel id="string_table">
 	</tabel>
 </div>
 
@@ -67,13 +76,28 @@
 	var parameterarray;
 	var sewprogramarray;
 	var selectLanguage;
-	var selectmode;
-	var editState = 0;
+	var selectmode = true;
+	//var editState = 0;
 	var InputCommentIndex = 0;
 	var OutputCommentIndex = 0;
 
 	var dropParameterIndex = 0;
 	var selectItemIndex = -1;
+	var lan_index;
+	var str_index = ['序号', 'Index', 'dizin','Index', 'Indice' ];
+	var str_disp = ['显示名', 'Disp','Disp', 'Disp', 'Disp' ];
+	var str_enum = ['枚举名称', 'Enumeration name','Enumeration name', 'Name der Nummerierung', 'Enumeration des noms' ];
+	var str_title = ['标题', 'Title','isim', 'Titel', 'Titre'];
+	var str_default = ['缺省', 'Default','öntanımlı', 'Standard', 'Par défaut'];
+	var str_range = ['范围', 'Range','Aralık', 'Bereich', "Champ d'application" ];
+	var str_formal = ['老名称', 'Formal','Formal', 'Formal', 'Formal'];
+	var str_auth = ['权限', 'Authority', 'mahkeme','Zuständigkeit', 'Autorité'];
+	var str_unit = ['单位', 'unit','Şirketi', 'Unternehmen', 'Unité'];
+	var str_value = ['参数值', 'Value','Değer', 'Wert', 'Valeur'];
+	var str_desc = ['描述', 'Description','tarif et', 'Beschreibung', 'Description'];
+	var str_operator = ['操作者', 'Operator','Operator', 'Operator', 'Opérateur', ];
+	var str_technician = ['技术员', 'Technician', 'Technician','Technicien', 'Technicien'];
+	var str_developer = ['开发者', 'Developer','geliştirici', 'Entwickler', 'Développeurs', ];
 
 	var inputElement = document.getElementById("jsonfile");
 	inputElement.addEventListener("change", handleFiles, false);
@@ -81,12 +105,95 @@
 	inputElement.addEventListener("change", handleFiles1, false);
 	var inputElement = document.getElementById("sewprogramfile");
 	inputElement.addEventListener("change", handleFiles2, false);
+	var selobj = document.getElementById('language');
+	var flagobj = document.getElementById('flag_img');
+	selobj.add(new Option("中文"));
+	selobj.add(new Option("English"));
+	selobj.add(new Option("Türk"));
+	selobj.add(new Option("Deutsch"));
+	selobj.add(new Option("français"));
+	selobj.addEventListener("change", ChangeLanugage, false);
 
-	if (language.indexOf('zh')) {
-		selectLanguage = true;
+	var language = localStorage.getItem("lan");
+	if (language == "zh") {
+		selobj.options[0].selected = true;
+		lan_index = 0;
+		flagobj.setAttribute('src', 'images\\china_flag.png');
 	}
-	else {
-		selectLanguage = false;
+	else if (language == "en") {
+		selobj.options[1].selected = true;
+		lan_index = 1;
+		flagobj.setAttribute('src', 'images\\england_flag.png');
+	}
+	else if (language == "tr") {
+		selobj.options[4].selected = true;
+		lan_index = 4;
+		flagobj.setAttribute('src', 'images\\turkey_flag.png');
+	}
+	else if (language == "de") {
+		selobj.options[2].selected = true;
+		lan_index = 2;
+		flagobj.setAttribute('src', 'images\\germany_flag.png');
+
+	}
+	else if (language == "fr") {
+		selobj.options[3].selected = true;
+		lan_index = 3;
+		flagobj.setAttribute('src', 'images\\france_flag.png');
+	}
+
+
+	//	if (language.indexOf('zh')) {
+	//		selectLanguage = false;
+	//	}
+	//	else {
+	//		selectLanguage = true;
+	//	}
+	function ChangeLanugage() {
+		var select = document.getElementById('language');
+		var selectIdx = 0;
+
+		if (select.options[0].selected == true) {
+			if (!!localStorage) {
+				localStorage.setItem("lan", "zh");
+			}
+			lan_index = 0;
+			flagobj.setAttribute('src', 'images\\china_flag.png');
+		}
+		else if (select.options[1].selected == true) {
+			if (!!localStorage) {
+				localStorage.setItem("lan", "en");
+			}
+			lan_index = 1;
+			flagobj.setAttribute('src', 'images\\england_flag.png');
+		}
+		else if (select.options[2].selected == true) {
+			if (!!localStorage) {
+				localStorage.setItem("lan", "tr");
+			}
+			lan_index = 2;
+			flagobj.setAttribute('src', 'images\\turkey_flag.png');
+		}
+		else if (select.options[3].selected == true) {
+			if (!!localStorage) {
+				localStorage.setItem("lan", "de");
+			}
+			lan_index = 3;
+			flagobj.setAttribute('src', 'images\\germany_flag.png');
+		}
+		else if (select.options[4].selected == true) {
+			if (!!localStorage) {
+				localStorage.setItem("lan", "fr");
+			}
+			lan_index = 4;
+			flagobj.setAttribute('src', 'images\\france_flag.png');
+		}
+		
+		loadcatestring();
+		if (selectmode)
+			user_loadparbycate();
+		else loadparbycate();
+
 	}
 
 	function SerachInoutCommentIndex() {
@@ -99,6 +206,24 @@
 				OutputCommentIndex = i;
 				break;
 			}
+		}
+	}
+
+	function loadcatestring() {
+		var selobj = document.getElementById('category');
+		selobj.length = 0;
+		for (var key in para_json.category) {
+			if (lan_index == 0)
+				selobj.add(new Option(para_json.category[key].enumname + ":  " + para_json.category[key].desc_zh));
+			else if (lan_index == 1)
+				selobj.add(new Option(para_json.category[key].enumname + ":  " + para_json.category[key].desc_en));
+			else if (lan_index == 2)
+				selobj.add(new Option(para_json.category[key].enumname + ":  " + para_json.category[key].desc_tr));
+			else if (lan_index == 3)
+				selobj.add(new Option(para_json.category[key].enumname + ":  " + para_json.category[key].desc_de));
+			else if (lan_index == 4)
+				selobj.add(new Option(para_json.category[key].enumname + ":  " + para_json.category[key].desc_fr));
+			
 		}
 	}
 
@@ -172,25 +297,16 @@
 			para_json = JSON.parse(this.result);
 			var selobj = document.getElementById('version');
 			selobj.innerHTML = "Version:" + para_json.Info.version + "  " + para_json.Info.desc_zh;
-			var selobj = document.getElementById('category');
-			selobj.length = 0;
-			for (var key in para_json.category) {
-				selobj.add(new Option(para_json.category[key].enumname + "  " + para_json.category[key].desc_zh));
-			}
-			var selobj = document.getElementById('errormsg');
-			for (var i = 0; i < para_json.errormessage.length; i++) {
-				if (language == 'zh-cn')
-					selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_zh));
-				else
-					selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_en));
-			}
-			SerachInoutCommentIndex();
-			user_loadparbycate();
-			//var str = JSON.stringify(para_json);
-			//将失信人信息存入cookie,这个存cookie的方法提前封装好
+			loadcatestring();
 			setJsonLocalStorage(para_json);
 		}
+
+		SerachInoutCommentIndex();
+		user_loadparbycate();
+		//var str = JSON.stringify(para_json);
+		//将失信人信息存入cookie,这个存cookie的方法提前封装好
 	}
+	
 
 	var para_json_str = getJsonLocalStorage();
 	para_json = JSON.parse(para_json_str);
@@ -199,17 +315,20 @@
 	if (para_json != null) {
 		var selobj = document.getElementById('version');
 		selobj.innerHTML = "Version:" + para_json.Info.version + "  " + para_json.Info.desc_zh;
-		var selobj = document.getElementById('category');
-		for (var key in para_json.category) {
-			if (language == 'zh-cn')
-				selobj.add(new Option(para_json.category[key].enumname + "  " + para_json.category[key].desc_zh));
-			else selobj.add(new Option(para_json.category[key].enumname));
-		}
+		loadcatestring();
 		var selobj = document.getElementById('errormsg');
 		for (var i = 0; i < para_json.errormessage.length; i++) {
-			if (language == 'zh-cn')
+			if (lan_index == 0)
 				selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_zh));
-			else selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_en));
+			else if (lan_index == 1)
+				selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_en));
+			else if (lan_index == 2)
+				selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_tr));
+			else if (lan_index == 3)
+				selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_de));
+			else if (lan_index == 4)
+				selobj.add(new Option('E' + para_json.errormessage[i].errorcode + "  " + para_json.errormessage[i].desc_fr));
+			
 		}
 		user_loadparbycate();
 	}
@@ -257,7 +376,7 @@
 			sss += "P00" + (3 + i).toString() + "</br>";
 			for (var j = 0; j < 25; j++) {
 				if (sewprogramarray[13 + i * 272 + j * 10 + 8] != 0) {
-					sss += "S" + (j+1).toString() + " Start:";
+					sss += "S" + (j + 1).toString() + " Start:";
 					if (sewprogramarray[13 + i * 272 + j * 10 + 0] == 1) {
 						sss += 'A ' + sewprogramarray[13 + i * 272 + j * 10 + 1].toString() + ' ' + 'B ' + sewprogramarray[13 + i * 272 + j * 10 + 2].toString() + ' ' + 'Section ' + sewprogramarray[13 + i * 272 + j * 10 + 3].toString();
 					}
@@ -294,7 +413,8 @@
 		var tr = document.createElement('tr');
 		tab.appendChild(tr);
 		var td = document.createElement("td");
-		td.innerHTML = selectLanguage ? 'Id' : '序号';
+		//td.innerHTML = selectLanguage ? 'Id' : '序号';
+		td.innerHTML = str_index[lan_index];
 		td.className = 'th0';
 		tr.appendChild(td);
 		//	var td = document.createElement("td");
@@ -302,42 +422,42 @@
 		//	td.className = 'th1';
 		//	tr.appendChild(td);
 		var td = document.createElement("td");
-		td.innerHTML = selectLanguage ? 'Disp' : '显示名';
+		td.innerHTML = str_disp[lan_index];//selectLanguage ? 'Disp' : '显示名';
 		td.className = 'th1';
 		tr.appendChild(td);
 		var td = document.createElement("td");
-		td.innerHTML = selectLanguage ? 'Enum' : '枚举名';
+		td.innerHTML = str_enum[lan_index];//selectLanguage ? 'Enum' : '枚举名';
 		td.className = 'th3';
 		tr.appendChild(td);
 		var td = document.createElement("td");
-		td.innerHTML = selectLanguage ? 'Title' : '标题';
+		td.innerHTML = str_title[lan_index];//selectLanguage ? 'Title' : '标题';
 		td.className = 'th4';
 		tr.appendChild(td);
 		var td = document.createElement("td");
 		if (parameterarray)
-			td.innerHTML = selectLanguage ? 'Range' : '范围';
+			td.innerHTML = str_range[lan_index];//selectLanguage ? 'Range' : '范围';
 		else
-			td.innerHTML = selectLanguage ? 'Range(Ref)' : '范围(参考)';
+			td.innerHTML = str_range[lan_index];//selectLanguage ? 'Range(Ref)' : '范围(参考)';
 		td.className = 'th5';
 		tr.appendChild(td);
 		var td = document.createElement("td");
-		td.innerHTML = selectLanguage ? 'Default' : '缺省';
+		td.innerHTML = str_default[lan_index];//selectLanguage ? 'Default' : '缺省';
 		td.className = 'th6';
 		tr.appendChild(td);
 		var td = document.createElement("td");
-		td.innerHTML = selectLanguage ? 'Value' : '参数值';
+		td.innerHTML = str_value[lan_index];//selectLanguage ? 'Value' : '参数值';
 		td.className = 'th7';
 		tr.appendChild(td);
 		var td = document.createElement("td");
-		td.innerHTML = selectLanguage ? 'Unit' : '单位';
+		td.innerHTML = str_unit[lan_index];//selectLanguage ? 'Unit' : '单位';
 		td.className = 'th8';
 		tr.appendChild(td);
 		var td = document.createElement("td");
-		td.innerHTML = selectLanguage ? 'Auth' : '权限';
+		td.innerHTML = str_auth[lan_index];
 		td.className = 'th9';
 		tr.appendChild(td);
 		var td = document.createElement("td");
-		td.innerHTML = selectLanguage ? 'Description' : '描述';
+		td.innerHTML = str_desc[lan_index];//selectLanguage ? 'Description' : '描述';
 		td.className = 'th10';
 		tr.appendChild(td);
 		var j = 0;
@@ -376,7 +496,19 @@
 					td.className = 'td3eve';
 				tr.appendChild(td);
 				var td = document.createElement("td");
-				td.innerHTML = selectLanguage ? (para_json.parameters[i].title_en) : (para_json.parameters[i].title_zh);
+				if (lan_index == 0)
+					td.innerHTML = para_json.parameters[i].title_zh;
+				else if (lan_index == 1)
+					td.innerHTML = para_json.parameters[i].title_en;
+				else if (lan_index == 2)
+					td.innerHTML = para_json.parameters[i].title_tr;
+				else if (lan_index == 3)
+					td.innerHTML = para_json.parameters[i].title_de;
+				else if (lan_index == 4)
+					td.innerHTML = para_json.parameters[i].title_fr;
+				
+
+				//td.innerHTML = selectLanguage ? (para_json.parameters[i].title_en) : (para_json.parameters[i].title_zh);
 				if (j % 2 == 0)
 					td.className = 'td4odd';
 				else
@@ -430,11 +562,11 @@
 
 				var td = document.createElement("td");
 				if (para_json.parameters[i].auth == "Au_Basic")
-					td.innerHTML = selectLanguage ? "Basic" : "操作者";
+					td.innerHTML = str_operator[lan_index];
 				else if (para_json.parameters[i].auth == "Au_Technician")
-					td.innerHTML = selectLanguage ? "Technician" : "技术员";
+					td.innerHTML = str_technician[lan_index];
 				else if (para_json.parameters[i].auth == "Au_Developer")
-					td.innerHTML = selectLanguage ? "Developer" : "开发者";
+					td.innerHTML = str_developer[lan_index];
 				if (j % 2 == 0)
 					td.className = 'td9odd';
 				else
@@ -443,7 +575,18 @@
 
 				var td = document.createElement("td");
 				if (para_json.parameters[i].type == 'Para_Option') {
-					var sssoption = selectLanguage ? (para_json.parameters[i].desc_en.split(';')) : (para_json.parameters[i].desc_zh.split(';'));
+					if (lan_index == 0)
+						var sssoption = para_json.parameters[i].desc_zh.split(';');
+					else if (lan_index == 1)
+						var sssoption = para_json.parameters[i].desc_en.split(';');
+					else if (lan_index == 2)
+						var sssoption = para_json.parameters[i].desc_tr.split(';');
+					else if (lan_index == 3)
+						var sssoption = para_json.parameters[i].desc_de.split(';');
+					else if (lan_index == 4)
+						var sssoption = para_json.parameters[i].desc_fr.split(';');
+					
+					//var sssoption = selectLanguage ? (para_json.parameters[i].desc_en.split(';')) : (para_json.parameters[i].desc_zh.split(';'));
 					var sss = '';
 					for (var kk = 0; kk < sssoption.length; kk++) {
 						sss += sssoption[kk];
@@ -452,7 +595,17 @@
 					td.innerHTML = sss;
 				}
 				else if (para_json.parameters[i].type == 'Para_InputChoices') {
-					var sssoption = selectLanguage ? (para_json.panelstrings[InputCommentIndex].desc_en.split(';')) : (para_json.panelstrings[InputCommentIndex].desc_zh.split(';'));
+					if (lan_index == 0)
+						var sssoption = para_json.panelstrings[InputCommentIndex].desc_zh.split(';');
+					else if (lan_index == 1)
+						var sssoption = para_json.panelstrings[InputCommentIndex].desc_en.split(';');
+					else if (lan_index == 2)
+						var sssoption = para_json.panelstrings[InputCommentIndex].desc_tr.split(';');
+					else if (lan_index == 3)
+						var sssoption = para_json.panelstrings[InputCommentIndex].desc_de.split(';');
+					else if (lan_index == 4)
+						var sssoption = para_json.panelstrings[InputCommentIndex].desc_fr.split(';');
+					
 					var sss = '';
 					for (var kk = 0; kk < sssoption.length; kk++) {
 						sss += sssoption[kk];
@@ -461,7 +614,17 @@
 					td.innerHTML = sss;
 				}
 				else if (para_json.parameters[i].type == 'Para_OutputChoices') {
-					var sssoption = selectLanguage ? (para_json.panelstrings[OutputCommentIndex].desc_en.split(';')) : (para_json.panelstrings[OutputCommentIndex].desc_zh.split(';'));
+					if (lan_index == 0)
+						var sssoption = para_json.panelstrings[OutputCommentIndex].desc_zh.split(';');
+					else if (lan_index == 1)
+						var sssoption = para_json.panelstrings[OutputCommentIndex].desc_en.split(';');
+					else if (lan_index == 2)
+						var sssoption = para_json.panelstrings[OutputCommentIndex].desc_tr.split(';');
+					else if (lan_index == 3)
+						var sssoption = para_json.panelstrings[OutputCommentIndex].desc_de.split(';');
+					else if (lan_index == 4)
+						var sssoption = para_json.panelstrings[OutputCommentIndex].desc_fr.split(';');
+					
 					var sss = '';
 					for (var kk = 0; kk < sssoption.length; kk++) {
 						sss += sssoption[kk];
@@ -470,7 +633,17 @@
 					td.innerHTML = sss;
 				}
 				else {
-					td.innerHTML = selectLanguage ? (para_json.parameters[i].desc_en) : (para_json.parameters[i].desc_zh);
+					if (lan_index == 0)
+						td.innerHTML = para_json.parameters[i].desc_zh;
+					else if (lan_index == 1)
+						td.innerHTML = para_json.parameters[i].desc_en;
+					else if (lan_index == 2)
+						td.innerHTML = para_json.parameters[i].desc_tr;
+					else if (lan_index == 3)
+						td.innerHTML = para_json.parameters[i].desc_de;
+					else if (lan_index == 4)
+						td.innerHTML = para_json.parameters[i].desc_fr;
+					
 				}
 				if (j % 2 == 0)
 					td.className = 'td10odd';
@@ -480,5 +653,296 @@
 				j++;
 			}
 		}
+		var tab = document.getElementById('errmsg_table');
+		tab.innerHTML = "";
+		var tr = document.createElement('tr');
+		tab.appendChild(tr);
+		var td = document.createElement("td");
+		td.innerHTML = str_index[lan_index];
+		td.className = 'th4';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = str_desc[lan_index];//selectLanguage ? 'Disp' : '显示名';
+		td.className = 'th11';
+		tr.appendChild(td);
+		for (var i = 0; i < para_json.errormessage.length; i++) {
+			var tr = document.createElement("tr" + i.toString());
+			tab.appendChild(tr);
+			//var trElement = document.getElementsByTagName("tr" + i.toString());
+
+			var td = document.createElement("td");
+			td.innerHTML = para_json.errormessage[i].errorcode;
+			if (i % 2 == 0)
+				td.className = 'td4odd';
+			else
+				td.className = 'td4eve';
+			tr.appendChild(td);
+			var td = document.createElement("td");
+			if (lan_index == 0)
+				td.innerHTML = para_json.errormessage[i].desc_zh;
+			else if (lan_index == 1)
+				td.innerHTML = para_json.errormessage[i].desc_en;
+			else if (lan_index == 2)
+				td.innerHTML = para_json.errormessage[i].desc_tr;
+			else if (lan_index == 3)
+				td.innerHTML = para_json.errormessage[i].desc_de;
+			else if (lan_index == 4)
+				td.innerHTML = para_json.errormessage[i].desc_fr;
+			
+			if (i % 2 == 0)
+				td.className = 'td11odd';
+			else
+				td.className = 'td11eve';
+			tr.appendChild(td);
+		}
+
+		var tab = document.getElementById('string_table');
+		tab.innerHTML = "";
+		var tr = document.createElement('tr');
+		tab.appendChild(tr);
+		var td = document.createElement("td");
+		td.innerHTML = str_index[lan_index];
+		td.className = 'th0';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = str_enum[lan_index];
+		td.className = 'th4';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = str_desc[lan_index];
+		td.className = 'th10';
+		tr.appendChild(td);
+		var td = document.createElement("td");
+		td.innerHTML = str_desc[lan_index];//selectLanguage ? 'Disp' : '显示名';
+		td.className = 'th10';
+		tr.appendChild(td);
+
+		for (var i = 0; i < para_json.panelstrings.length; i++) {
+			var tr = document.createElement("tr" + i.toString());
+			tab.appendChild(tr);
+			//var trElement = document.getElementsByTagName("tr" + i.toString());
+			var td = document.createElement("td");
+			td.innerHTML = i.toString();
+			if (i % 2 == 0)
+				td.className = 'td0odd';
+			else
+				td.className = 'td0eve';
+			tr.appendChild(td);
+			var td = document.createElement("td");
+			td.innerHTML = para_json.panelstrings[i].enumname;
+			if (i % 2 == 0)
+				td.className = 'td4odd';
+			else
+				td.className = 'td4eve';
+			tr.appendChild(td);
+			var td = document.createElement("td");
+			td.innerHTML = para_json.panelstrings[i].desc_en;
+			if (i % 2 == 0)
+				td.className = 'td10odd';
+			else
+				td.className = 'td10eve';
+			tr.appendChild(td);
+			var td = document.createElement("td");
+			if (lan_index == 0)
+				td.innerHTML = para_json.panelstrings[i].desc_zh;
+			else if (lan_index == 1)
+				td.innerHTML = para_json.panelstrings[i].desc_en;
+			else if (lan_index == 2)
+				td.innerHTML = para_json.panelstrings[i].desc_tr;
+			else if (lan_index == 3)
+				td.innerHTML = para_json.panelstrings[i].desc_de;
+			else if (lan_index == 4)
+				td.innerHTML = para_json.panelstrings[i].desc_fr;
+			
+			if (i % 2 == 0)
+				td.className = 'td10odd';
+			else
+				td.className = 'td10eve';
+			tr.appendChild(td);
+		}
+	}
+
+	var buttonElement = document.getElementById("exportcsv");
+	buttonElement.addEventListener("click", tableToExcel, false);
+	function tableToExcel() {
+		//列标题，逗号隔开，每一个逗号就是隔开一个单元格
+		let str = '';
+		//增加\t为了不让表格显示科学计数法或者其他格式
+		for (let i = 0; i < para_json.parameters.length; i++) {
+			if (para_json.parameters[i].title_zh.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].title_zh + '",';
+			}
+			else {
+				str += para_json.parameters[i].title_zh + ',';
+			}
+
+			if (para_json.parameters[i].title_en.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].title_en + '",';
+			}
+			else {
+				str += para_json.parameters[i].title_en + ',';
+			}
+			if (para_json.parameters[i].title_tr.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].title_tr + '",';
+			}
+			else {
+				str += para_json.parameters[i].title_tr + ',';
+			}
+			if (para_json.parameters[i].title_de.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].title_de + '",';
+			}
+			else {
+				str += para_json.parameters[i].title_de + ',';
+			}
+
+			if (para_json.parameters[i].title_fr.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].title_fr + '",';
+			}
+			else {
+				str += para_json.parameters[i].title_fr + ',';
+			}
+
+
+			str += '\n';
+
+			if (para_json.parameters[i].desc_zh.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].desc_zh + '",';
+			}
+			else {
+				str += para_json.parameters[i].desc_zh + ',';
+			}
+
+			if (para_json.parameters[i].desc_en.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].desc_en + '",';
+			}
+			else {
+				str += para_json.parameters[i].desc_en + ',';
+			}
+			if (para_json.parameters[i].desc_tr.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].desc_tr + '",';
+			}
+			else {
+				str += para_json.parameters[i].desc_tr + ',';
+			}
+			if (para_json.parameters[i].desc_de.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].desc_de + '",';
+			}
+			else {
+				str += para_json.parameters[i].desc_de + ',';
+			}
+
+			if (para_json.parameters[i].desc_fr.indexOf(',') != -1) {
+				str += '"' + para_json.parameters[i].desc_fr + '",';
+			}
+			else {
+				str += para_json.parameters[i].desc_fr + ',';
+			}
+
+
+			str += '\n';
+		}
+		for (let i = 0; i < para_json.errormessage.length; i++) {
+
+			if (para_json.errormessage[i].desc_zh.indexOf(',') != -1) {
+				str += '"' + para_json.errormessage[i].desc_zh + '",';
+			}
+			else {
+				str += para_json.errormessage[i].desc_zh + ',';
+			}
+
+			if (para_json.errormessage[i].desc_en.indexOf(',') != -1) {
+				str += '"' + para_json.errormessage[i].desc_en + '",';
+			}
+			else {
+				str += para_json.errormessage[i].desc_en + ',';
+			}
+			if (para_json.errormessage[i].desc_tr.indexOf(',') != -1) {
+				str += '"' + para_json.errormessage[i].desc_tr + '",';
+			}
+			else {
+				str += para_json.errormessage[i].desc_tr + ',';
+			}
+			if (para_json.errormessage[i].desc_de.indexOf(',') != -1) {
+				str += '"' + para_json.errormessage[i].desc_de + '",';
+			}
+			else {
+				str += para_json.errormessage[i].desc_de + ',';
+			}
+
+			if (para_json.errormessage[i].desc_fr.indexOf(',') != -1) {
+				str += '"' + para_json.errormessage[i].desc_fr + '",';
+			}
+			else {
+				str += para_json.errormessage[i].desc_fr + ',';
+			}
+
+
+			str += '\n';
+		}
+		// for (let i = 0; i < para_json.machinetype.length; i++) {
+
+		// 	if (para_json.machinetype[i].type.indexOf(',') != -1) {
+		// 		str += '"' + para_json.machinetype[i].type + '",';
+		// 	}
+		// 	else {
+		// 		str += para_json.machinetype[i].desc_zh + ',';
+		// 	}
+
+		// 	if (para_json.machinetype[i].type.indexOf(',') != -1) {
+		// 		str += '"' + para_json.machinetype[i].type + '",';
+		// 	}
+		// 	else {
+		// 		str += para_json.machinetype[i].desc_en + ',';
+		// 	}
+		// 	str += '\n';
+		// }
+		for (let i = 0; i < para_json.panelstrings.length; i++) {
+
+			if (para_json.panelstrings[i].desc_zh.indexOf(',') != -1) {
+				str += '"' + para_json.panelstrings[i].desc_zh + '",';
+			}
+			else {
+				str += para_json.panelstrings[i].desc_zh + ',';
+			}
+
+			if (para_json.panelstrings[i].desc_en.indexOf(',') != -1) {
+				str += '"' + para_json.panelstrings[i].desc_en + '",';
+			}
+			else {
+				str += para_json.panelstrings[i].desc_en + ',';
+			}
+			if (para_json.panelstrings[i].desc_tr.indexOf(',') != -1) {
+				str += '"' + para_json.panelstrings[i].desc_tr + '",';
+			}
+			else {
+				str += para_json.panelstrings[i].desc_tr + ',';
+			}
+			if (para_json.panelstrings[i].desc_de.indexOf(',') != -1) {
+				str += '"' + para_json.panelstrings[i].desc_de + '",';
+			}
+			else {
+				str += para_json.panelstrings[i].desc_de + ',';
+			}
+
+			if (para_json.panelstrings[i].desc_fr.indexOf(',') != -1) {
+				str += '"' + para_json.panelstrings[i].desc_fr + '",';
+			}
+			else {
+				str += para_json.panelstrings[i].desc_fr + ',';
+			}
+
+
+			str += '\n';
+		}
+		//encodeURIComponent解决中文乱码
+		let uri = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(str);
+		//通过创建a标签实现
+		let link = document.createElement("a");
+		link.href = uri;
+		//对下载的文件命名
+		link.download = "String.csv";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
 	}
 </script>

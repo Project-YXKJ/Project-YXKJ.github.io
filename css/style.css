@@ -95,6 +95,12 @@ border-radius: 5px;
     background-color: #3366FF;
     text-align: center;
 }
+.th11
+{
+    width:1600px;
+    background-color: #3366FF;
+    text-align: center;
+}
 .td0odd
 {
     width:50px;
@@ -152,6 +158,11 @@ border-radius: 5px;
 .td10odd
 {
     width:800px;
+    background-color: snow;
+}
+.td11odd
+{
+    width:1600px;
     background-color: snow;
 }
 .td0eve
@@ -219,7 +230,11 @@ border-radius: 5px;
     width:800px;
     background-color: #E6F3F9;
 }
-
+.td11eve
+{
+    width:1600px;
+    background-color: #E6F3F9;
+}
 /*分享状态样式*/
 .shareBox .shareState{
     width: 100%;
